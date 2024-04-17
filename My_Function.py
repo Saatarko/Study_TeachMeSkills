@@ -1,11 +1,12 @@
-from tkinter import messagebox as mb
 from datetime import datetime
+from tkinter import messagebox as mb
 
 
 def check_value(a, func_type):
     """Функция проверки значений на число type(a)- list, func_type - 'digit' или 'float'"""
     external_verification = False
     check = False
+    list_sizes = ''
 
     if isinstance(a, str) and a.isdigit() is True:
         list_sizes = list(map(int, a.split()))
@@ -116,7 +117,7 @@ def check_date_func(d):
     check = False
     if len(d.split('.')) == 3:
         try:
-            s = datetime.strptime(d, '%d.%m.%Y')
+            datetime.strptime(d, '%d.%m.%Y')
             check = True
         except Exception:
             mb.showwarning("Предупреждение", "Формат даты не тот")
@@ -125,7 +126,7 @@ def check_date_func(d):
     return check
 
 
-def bin_rec_find(value, low, high, mid, a, real_mid):
+def bin_rec_find(value, low, high, mid, a):
     """Функция бинарного рекурсивного поиска, value - искомое значение, low и high - верхняя и нижняя  границы списка
     , a - список чисел, state - статус вызова, снаружи или рекурсия"""
 
@@ -140,7 +141,6 @@ def bin_rec_find(value, low, high, mid, a, real_mid):
     low = int(low)
     high = int(high)
     mid = int(mid)
-    real_mid = int(real_mid)
 
     if c[mid] == value:
         check = True
@@ -155,32 +155,30 @@ def bin_rec_find(value, low, high, mid, a, real_mid):
 
     mid = ((low + high) // 2)
     if check is False:
-        bin_rec_find(value, low, high, mid, c, real_mid)
+        bin_rec_find(value, low, high, mid, c)
 
     return mid, check
 
 
 def func_convert_dec_in_bin(n, s):
-    """Функция перевода числа из десятичного в двоичное"""
+    """Функция перевода числа из десятичного в двоичное. n-само число, s- строка с результатами функции для рекурсии"""
 
-    global conv_str
     n = int(n)
     s += f'{n - 2 * (n // 2)}'
     temp = n // 2
-    c = n - 2 * (n // 2)
 
     if n == 1:
 
         s += str(temp)
-        conv_str = s[::-1]
+        s = s[::-1]
+
+        return s
     else:
-
-        func_convert_dec_in_bin(temp, s)
-
-    return conv_str
+        return func_convert_dec_in_bin(temp, s)
 
 
 def func_prime_number(n):
+    """Функция проверки на то простое ли число. n - число для проверки"""
     check = False
 
     if n % 2 == 0:           # Проверяем деление на 2(если делится число не простое)
@@ -197,7 +195,58 @@ def func_prime_number(n):
 
 
 def func_nod(x, y):
+    """Функция определения Наименьшего Общего Делителя (НОД), х, y - числа для поиска"""
     if y == 0:  # делим каждое число
         return x  # return x
     else:
         return func_nod(y, x % y)
+
+
+def func_encryption(enc_str, key, lang):
+    """Функция шифрования и дешифрования по методу Цезаря.enc_str -
+    текст для шифрования,key -ключ, lang- язык текста """
+    dictionary = dictionary_upper = ''
+
+    if lang == 'Русский':
+        dictionary, dictionary_upper = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+    elif lang == 'Английский':
+        dictionary, dictionary_upper = "abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    result_str, temp_dict = [], ""
+
+    for i in range(len(enc_str)):
+
+        if enc_str[i] in dictionary:     # Проверяем нижний регистр
+            temp_dict = dictionary
+
+        elif enc_str[i] in dictionary_upper:  # Проверяем верхний регистр
+            temp_dict = dictionary_upper
+
+        else:
+            result_str.append(enc_str[i])       # Если там нет, значит это или спец знак или цифра
+
+        if enc_str[i] in temp_dict:
+            # Цикл перебора азбуки
+            for j in range(len(temp_dict)):
+                # Если порядковый номер буквы + ключ находятся  в диапазоне от 0 до конца словаря
+                # и если буква из текста совпадает с буквой из азбуки, то:
+                if 0 <= j + key < len(temp_dict) and enc_str[i] == temp_dict[j]:
+                    # В результат добавляется буква со сдвигом key (зашифрованная буква)
+                    result_str.append(temp_dict[j + key])
+                    break
+                # Если порядковый номер буквы + ключ выходит из диапазона азбуки, превышая его
+                # и если буква из текста совпадает с буквой из азбуки, то:
+                elif j + key >= len(temp_dict) and enc_str[i] == temp_dict[j]:
+                    # В результат добавляется буква со сдвигом key,
+                    # при этом преводя порядковый номер буквы к диапазону азбуки (зашифрованая буква)
+                    result_str.append(temp_dict[(1 - j - key) % (len(temp_dict) - 1)])
+                    break
+                # Если порядковый номер буквы + ключ выходит из диапазона азбуки, недотягивает до него
+                # и если буква из текста совпадает с буквой из азбуки, то:
+                elif j + key < 0 and enc_str[i] == temp_dict[j]:
+                    # В результат добавляется буква со сдвигом key,
+                    # при этом приводя порядковый номер буквы к диапазону азбуки (зашифрованная буква)
+                    result_str.append(temp_dict[(j + key) % len(temp_dict)])
+                    break
+
+    return ' '.join(result_str)
