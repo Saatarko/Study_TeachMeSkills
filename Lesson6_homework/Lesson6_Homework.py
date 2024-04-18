@@ -206,17 +206,44 @@ def get_data_for_encrypted_vishener():
             for i in range(key_multiplicity + 1):
                 temp_key += key
 
-        key_multiplicity = len(key) - len(base_str)
+        key_multiplicity = len(temp_key) - len(base_str)
         key = temp_key[0:(-1)*key_multiplicity]
         encrypt_str = func_encrypted_vishener(base_str, key, lang_encrypt)
 
         if encrypt_str == base_str:
             mb.showwarning(f"Предупреждение", f"Введенный текст не  совпадает с выбранным языком!")
         else:
-            entry_encryption3_tab3.config(state="normal")
-            entry_encryption3_tab3.delete(0, END)
-            entry_encryption3_tab3.insert(END, f' {encrypt_str}')
-            entry_encryption3_tab3.config(state="readonly")
+            entry_encryption3_tab4.config(state="normal")
+            entry_encryption3_tab4.delete(0, END)
+            entry_encryption3_tab4.insert(END, f' {encrypt_str}')
+            entry_encryption3_tab4.config(state="readonly")
+
+
+def get_data_for_decrypted_vishener():
+
+    base_str = entry_encryption4_tab4.get()
+    key = entry_encryption5_tab4.get()
+    temp_key = ''
+    if key == '':
+        mb.showwarning(f"Предупреждение", f"Ключ не может быть пустым!")
+    else:
+        lang_encrypt = combobox_tab4.get()
+        if len(key) < len(base_str):
+            key_multiplicity = (len(base_str)) // (len(key))
+            for i in range(key_multiplicity + 1):
+                temp_key += key
+
+        key_multiplicity = len(temp_key) - len(base_str)
+        key = temp_key[0:(-1) * key_multiplicity]
+        encrypt_str = func_decrypted_vishener(base_str, key, lang_encrypt)
+
+        if encrypt_str == base_str:
+            mb.showwarning(f"Предупреждение", f"Введенный текст не  совпадает с выбранным языком!")
+        else:
+            entry_encryption6_tab4.config(state="normal")
+            entry_encryption6_tab4.delete(0, END)
+            entry_encryption6_tab4.insert(END, f' {encrypt_str}')
+            entry_encryption6_tab4.config(state="readonly")
 
 
 def clear_data():  # Кнопка очищения полей для списка чисел
@@ -433,5 +460,32 @@ lab_encryption5_tab4.place(x=10, y=225, width=480, height=15)
 
 entry_encryption3_tab4 = Entry(tab4, font='Arial 10 bold', width=15, borderwidth=2, state='readonly')
 entry_encryption3_tab4.place(x=10, y=245, width=480, height=30)
+
+lab_encryption6_tab4 = Label(tab4, text='Введите строку для расшифровки', font='Arial 11 bold')
+lab_encryption6_tab4.place(x=10, y=280, width=480, height=15)
+
+entry_encryption4_tab4 = Entry(tab4, font='Arial 10 bold', width=15, borderwidth=2)
+entry_encryption4_tab4.place(x=10, y=300, width=480, height=30)
+
+lab_encryption3_tab4 = Label(tab4, text='Выберите язык введенного текста', font='Arial 9')
+lab_encryption3_tab4.place(x=10, y=335, width=480, height=15)
+
+combobox2_tab4 = ttk.Combobox(tab4, textvariable=languages_var, values=languages)
+combobox2_tab4.place(x=10, y=380, width=480, height=30)
+
+lab_encryption7_tab4 = Label(tab4, text='Ключ шифрования (слово)', font='Arial 9')
+lab_encryption7_tab4.place(x=10, y=415, width=240, height=30)
+
+entry_encryption5_tab4 = Entry(tab4, font='Arial 10 bold', width=15, borderwidth=2)
+entry_encryption5_tab4.place(x=250, y=415, width=240, height=30)
+
+button_encryption2_tab4 = Button(tab4, text='Расшифровать', font='Arial 10 ', command=get_data_for_decrypted_vishener)
+button_encryption2_tab4.place(x=10, y=450, width=480, height=30)
+
+lab_encryption8_tab4 = Label(tab4, text='Результат расшифровки', font='Arial 9')
+lab_encryption8_tab4.place(x=10, y=485, width=480, height=15)
+
+entry_encryption6_tab4 = Entry(tab4, font='Arial 10 bold', width=15, borderwidth=2, state='readonly')
+entry_encryption6_tab4.place(x=10, y=505, width=480, height=30)
 
 lesson_6.mainloop()

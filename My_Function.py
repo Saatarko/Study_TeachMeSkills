@@ -119,7 +119,7 @@ def check_date_func(d):
         try:
             datetime.strptime(d, '%d.%m.%Y')
             check = True
-        except Exception:
+        except ValueError:  # Перехват ошибки (если данные не числовые):
             mb.showwarning("Предупреждение", "Формат даты не тот")
             check = False
 
@@ -256,15 +256,14 @@ def func_encryption(enc_str, key, lang, type):
 
 
 def func_encrypted_vishener(enc_str, key, lang):
-    """Функция шифрования и дешифрования по методу Цезаря.enc_str -
-        текст для шифрования,key -ключ, lang- язык текста """
+    """Функция шифрования и дешифрования по методу Вишенера.enc_str -
+        текст для шифрования, key -ключ, lang- язык текста """
 
     dictionary, new_dictionary = '', ''
     enc_str = enc_str.upper()
+    key = key.upper()
     massive = []
-
-
-    i, j = 0, 0
+    temp_str = ''
 
     if lang == 'Русский':
         dictionary = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
@@ -274,7 +273,50 @@ def func_encrypted_vishener(enc_str, key, lang):
         dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
 
+    for i in range(len(enc_str)):
+
+        try:
+            temp_index_x = dictionary.index(enc_str[i])
+            temp_index_y = dictionary.index(key[i])
+            temp_str += massive[temp_index_x][temp_index_y]
+        except ValueError:  # Перехват ошибки (означает что в тексте какой-то символ или пробел):
+            temp_str += enc_str[i]
+
+    return temp_str
 
 
-    return
+def func_decrypted_vishener(enc_str, key, lang):
+    """Функция шифрования и дешифрования по методу Вишенера.enc_str -
+        текст для шифрования, key -ключ, lang- язык текста """
 
+    dictionary, temp_str_mass = '', list
+    enc_str = enc_str.upper()
+    key = key.upper()
+    massive = []
+    temp_str, temp_str_mass = '', ''
+
+
+    if lang == 'Русский':
+        dictionary = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+        massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
+        print('')
+    elif lang == 'Английский':
+        dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
+    temp_str_mass = func_encryption(dictionary, 0, lang, 'vishener')
+
+    for i in range(len(key)):
+
+        try:
+            temp_index_y = dictionary.index(key[i])
+            for j in range(len(temp_str_mass)):
+                if massive[j][temp_index_y] == enc_str[i]:
+
+                    temp_str += temp_str_mass[j]
+                    break
+                elif massive[j][temp_index_y] != enc_str[i] and j == 32:
+                    temp_str += enc_str[i]
+        except ValueError:  # Перехват ошибки (означает что в тексте какой-то символ или пробел):
+            temp_str += enc_str[i]
+
+    return temp_str
