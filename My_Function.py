@@ -181,10 +181,10 @@ def func_prime_number(n):
     """Функция проверки на то простое ли число. n - число для проверки"""
     check = False
 
-    if n % 2 == 0:           # Проверяем деление на 2(если делится число не простое)
+    if n % 2 == 0:  # Проверяем деление на 2(если делится число не простое)
         check = True
     else:
-        for i in range(3, int(n**0.5)+1, 2):
+        for i in range(3, int(n ** 0.5) + 1, 2):
             # Делаем цикл от 3 (т.к 2 и 1 -очевидно исключаются,
             # и проверяем до корня из числа (ибо выше не имеет смысла) плюс только нечетные (ибо четные нет смысла)
 
@@ -202,7 +202,7 @@ def func_nod(x, y):
         return func_nod(y, x % y)
 
 
-def func_encryption(enc_str, key, lang):
+def func_encryption(enc_str, key, lang, type):
     """Функция шифрования и дешифрования по методу Цезаря.enc_str -
     текст для шифрования,key -ключ, lang- язык текста """
     dictionary = dictionary_upper = ''
@@ -216,14 +216,14 @@ def func_encryption(enc_str, key, lang):
 
     for i in range(len(enc_str)):
 
-        if enc_str[i] in dictionary:     # Проверяем нижний регистр
+        if enc_str[i] in dictionary:  # Проверяем нижний регистр
             temp_dict = dictionary
 
         elif enc_str[i] in dictionary_upper:  # Проверяем верхний регистр
             temp_dict = dictionary_upper
 
         else:
-            result_str.append(enc_str[i])       # Если там нет, значит это или спец знак или цифра
+            result_str.append(enc_str[i])  # Если там нет, значит это или спец знак или цифра
 
         if enc_str[i] in temp_dict:
             # Цикл перебора азбуки
@@ -239,7 +239,7 @@ def func_encryption(enc_str, key, lang):
                 elif j + key >= len(temp_dict) and enc_str[i] == temp_dict[j]:
                     # В результат добавляется буква со сдвигом key,
                     # при этом преводя порядковый номер буквы к диапазону азбуки (зашифрованая буква)
-                    result_str.append(temp_dict[(1 - j - key) % (len(temp_dict) - 1)])
+                    result_str.append(temp_dict[((j + key) % (len(temp_dict) - 1)) -1])
                     break
                 # Если порядковый номер буквы + ключ выходит из диапазона азбуки, недотягивает до него
                 # и если буква из текста совпадает с буквой из азбуки, то:
@@ -248,5 +248,33 @@ def func_encryption(enc_str, key, lang):
                     # при этом приводя порядковый номер буквы к диапазону азбуки (зашифрованная буква)
                     result_str.append(temp_dict[(j + key) % len(temp_dict)])
                     break
+    if type == 'caesar':
+        result_str = ' '.join(result_str)
+        result_str = result_str.replace(' ', '')
 
-    return ' '.join(result_str)
+    return result_str
+
+
+def func_encrypted_vishener(enc_str, key, lang):
+    """Функция шифрования и дешифрования по методу Цезаря.enc_str -
+        текст для шифрования,key -ключ, lang- язык текста """
+
+    dictionary, new_dictionary = '', ''
+    enc_str = enc_str.upper()
+    massive = []
+
+
+    i, j = 0, 0
+
+    if lang == 'Русский':
+        dictionary = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+        massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
+        print('')
+    elif lang == 'Английский':
+        dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
+
+
+
+    return
+

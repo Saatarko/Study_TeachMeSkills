@@ -6,7 +6,7 @@ from tkinter import messagebox as mb
 
 lesson_6 = Tk()  # Объявляем класс
 
-lesson_6.title("Расчеты по теме 5")
+lesson_6.title("Расчеты по теме 6")
 
 # Получаем ширину и высоту экрана
 screen_width = lesson_6.winfo_screenwidth()
@@ -22,7 +22,7 @@ lesson_6.geometry(f"{window_width}x{window_height}+{x}+{y}")
 lesson_6.resizable(None, None)  # Запрещаем изменять размер окна
 lesson_6["bg"] = "gray22"  # gray gray0-99   # Устанавливаем цвет фона
 
-tab_control = ttk.Notebook(lesson_6)   # создаем клас для закладок
+tab_control = ttk.Notebook(lesson_6)   # создаем подкласс для закладок
 
 tab1 = ttk.Frame(tab_control)   # создаем закладки
 tab2 = ttk.Frame(tab_control)
@@ -83,7 +83,7 @@ def sorting_rec_find():  # Функция для бинарного поиска
     high_rec = int(len(list_sort) - 1)
     mid_rec = (low_rec + high_rec) // 2
 
-    index_find, check_list = bin_rec_find(simbol_find, low_rec, high_rec, mid_rec, list_sort, 0)
+    index_find, check_list = bin_rec_find(simbol_find, low_rec, high_rec, mid_rec, list_sort)
 
     entry_sort_numbers6_tab1.config(state="normal")
     entry_sort_numbers6_tab1.delete(0, END)
@@ -155,8 +155,9 @@ def get_data_for_encrypted():
     if key == '':
         key = 0
     lang_encrypt = combobox_tab3.get()
-    key, check_reserve= check_value(key, 'digit')
-    encrypt_str = func_encryption(base_str, key, lang_encrypt)
+    key, check_reserve = check_value(key, 'digit')
+    encrypt_str = func_encryption(base_str, key, lang_encrypt, 'caesar')
+    # encrypt_str = encrypt_str.replace(' ', '')
 
     if check_reserve is True:
 
@@ -176,9 +177,9 @@ def get_data_for_decrypted():
     if key == '':
         key = 0
     lang_encrypt = combobox2_tab3.get()
-    key, check_reserve= check_value(key, 'digit')
+    key, check_reserve = check_value(key, 'digit')
     key = key * (-1)
-    encrypt_str = func_encryption(base_str, key, lang_encrypt)
+    encrypt_str = func_encryption(base_str, key, lang_encrypt, 'caesar')
 
     if check_reserve is True:
 
@@ -189,6 +190,33 @@ def get_data_for_decrypted():
             entry_encryption6_tab3.delete(0, END)
             entry_encryption6_tab3.insert(END, f' {encrypt_str}')
             entry_encryption6_tab3.config(state="readonly")
+
+
+def get_data_for_encrypted_vishener():
+
+    base_str = entry_encryption1_tab4.get()
+    key = entry_encryption2_tab4.get()
+    temp_key = ''
+    if key == '':
+        mb.showwarning(f"Предупреждение", f"Ключ не может быть пустым!")
+    else:
+        lang_encrypt = combobox_tab4.get()
+        if len(key) < len(base_str):
+            key_multiplicity = (len(base_str)) // (len(key))
+            for i in range(key_multiplicity + 1):
+                temp_key += key
+
+        key_multiplicity = len(key) - len(base_str)
+        key = temp_key[0:(-1)*key_multiplicity]
+        encrypt_str = func_encrypted_vishener(base_str, key, lang_encrypt)
+
+        if encrypt_str == base_str:
+            mb.showwarning(f"Предупреждение", f"Введенный текст не  совпадает с выбранным языком!")
+        else:
+            entry_encryption3_tab3.config(state="normal")
+            entry_encryption3_tab3.delete(0, END)
+            entry_encryption3_tab3.insert(END, f' {encrypt_str}')
+            entry_encryption3_tab3.config(state="readonly")
 
 
 def clear_data():  # Кнопка очищения полей для списка чисел
@@ -329,7 +357,7 @@ lab_encryption3_tab3.place(x=10, y=85, width=480, height=15)
 
 languages = ["Русский", "Английский"]
 languages_var = StringVar(value=languages[0])
-combobox_tab3 = ttk.Combobox(tab3,textvariable=languages_var, values=languages)
+combobox_tab3 = ttk.Combobox(tab3, textvariable=languages_var, values=languages)
 combobox_tab3.place(x=10, y=120, width=480, height=30)
 
 lab_encryption4_tab3 = Label(tab3, text='Ключ шифрования (цифра)', font='Arial 9')
@@ -356,23 +384,23 @@ entry_encryption4_tab3.place(x=10, y=300, width=480, height=30)
 lab_encryption3_tab3 = Label(tab3, text='Выберите язык введенного текста', font='Arial 9')
 lab_encryption3_tab3.place(x=10, y=335, width=480, height=15)
 
-combobox2_tab3 = ttk.Combobox(tab3,textvariable=languages_var, values=languages)
+combobox2_tab3 = ttk.Combobox(tab3, textvariable=languages_var, values=languages)
 combobox2_tab3.place(x=10, y=380, width=480, height=30)
 
 lab_encryption7_tab3 = Label(tab3, text='Ключ шифрования (цифра)', font='Arial 9')
 lab_encryption7_tab3.place(x=10, y=415, width=240, height=30)
 
 entry_encryption5_tab3 = Entry(tab3, font='Arial 10 bold', width=15, borderwidth=2)
-entry_encryption5_tab3.place(x=250, y=450, width=240, height=30)
+entry_encryption5_tab3.place(x=250, y=415, width=240, height=30)
 
 button_encryption2_tab3 = Button(tab3, text='Расшифровать', font='Arial 10 ', command=get_data_for_decrypted)
-button_encryption2_tab3.place(x=10, y=485, width=480, height=30)
+button_encryption2_tab3.place(x=10, y=450, width=480, height=30)
 
 lab_encryption8_tab3 = Label(tab3, text='Результат расшифровки', font='Arial 9')
-lab_encryption8_tab3.place(x=10, y=520, width=480, height=15)
+lab_encryption8_tab3.place(x=10, y=485, width=480, height=15)
 
 entry_encryption6_tab3 = Entry(tab3, font='Arial 10 bold', width=15, borderwidth=2, state='readonly')
-entry_encryption6_tab3.place(x=10, y=540, width=480, height=30)
+entry_encryption6_tab3.place(x=10, y=505, width=480, height=30)
 
 # Четвертая вкладка
 
@@ -388,9 +416,7 @@ entry_encryption1_tab4.place(x=10, y=50, width=480, height=30)
 lab_encryption3_tab4 = Label(tab4, text='Выберите язык введенного текста', font='Arial 9')
 lab_encryption3_tab4.place(x=10, y=85, width=480, height=15)
 
-languages = ["Русский", "Английский"]
-languages_var = StringVar(value=languages[0])
-combobox_tab4 = ttk.Combobox(tab4,textvariable=languages_var, values=languages)
+combobox_tab4 = ttk.Combobox(tab4, textvariable=languages_var, values=languages)
 combobox_tab4.place(x=10, y=120, width=480, height=30)
 
 lab_encryption4_tab4 = Label(tab4, text='Ключ шифрования (слово)', font='Arial 9')
@@ -399,7 +425,7 @@ lab_encryption4_tab4.place(x=10, y=155, width=240, height=30)
 entry_encryption2_tab4 = Entry(tab4, font='Arial 10 bold', width=15, borderwidth=2)
 entry_encryption2_tab4.place(x=250, y=155, width=240, height=30)
 
-button_encryption_tab4 = Button(tab4, text='Зашифровать', font='Arial 10 ', command=get_data_for_encrypted)
+button_encryption_tab4 = Button(tab4, text='Зашифровать', font='Arial 10 ', command=get_data_for_encrypted_vishener)
 button_encryption_tab4.place(x=10, y=190, width=480, height=30)
 
 lab_encryption5_tab4 = Label(tab4, text='Результат шифрования', font='Arial 9')
