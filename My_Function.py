@@ -2,6 +2,7 @@ from datetime import datetime
 from tkinter import messagebox as mb
 
 
+
 def check_value(a, func_type):
     """Функция проверки значений на число type(a)- list, func_type - 'digit' или 'float'"""
     external_verification = False

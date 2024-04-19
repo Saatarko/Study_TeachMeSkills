@@ -6,7 +6,7 @@ from tkinter import messagebox as mb
 
 lesson_6 = Tk()  # Объявляем класс
 
-lesson_6.title("Расчеты по теме 6")
+lesson_6.title("Расчеты по теме 6. Расчеты, переводы, шифрование")
 
 # Получаем ширину и высоту экрана
 screen_width = lesson_6.winfo_screenwidth()
@@ -22,18 +22,21 @@ lesson_6.geometry(f"{window_width}x{window_height}+{x}+{y}")
 lesson_6.resizable(None, None)  # Запрещаем изменять размер окна
 lesson_6["bg"] = "gray22"  # gray gray0-99   # Устанавливаем цвет фона
 
-tab_control = ttk.Notebook(lesson_6)   # создаем подкласс для закладок
+tab_control = ttk.Notebook(lesson_6) # создаем подкласс для закладок
+
 
 tab1 = ttk.Frame(tab_control)   # создаем закладки
 tab2 = ttk.Frame(tab_control)
 tab3 = ttk.Frame(tab_control)
 tab4 = ttk.Frame(tab_control)
 
+
 tab_control.add(tab1, text='Рекурсия и перевод')
 tab_control.add(tab2, text='Простое число и НОД')
 tab_control.add(tab3, text='Шифр Цезаря')
 tab_control.add(tab4, text='Шифр Виженера')
 tab_control.pack(expand=1, fill='both')
+
 
 
 def get_data_list_numbers():     # Функция получения данных списка чисел
