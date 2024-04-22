@@ -2,7 +2,6 @@ from datetime import datetime
 from tkinter import messagebox as mb
 
 
-
 def check_value(a, func_type):
     """Функция проверки значений на число type(a)- list, func_type - 'digit' или 'float'"""
     external_verification = False
@@ -240,7 +239,7 @@ def func_encryption(enc_str, key, lang, type):
                 elif j + key >= len(temp_dict) and enc_str[i] == temp_dict[j]:
                     # В результат добавляется буква со сдвигом key,
                     # при этом преводя порядковый номер буквы к диапазону азбуки (зашифрованая буква)
-                    result_str.append(temp_dict[((j + key) % (len(temp_dict) - 1)) -1])
+                    result_str.append(temp_dict[((j + key) % (len(temp_dict) - 1)) - 1])
                     break
                 # Если порядковый номер буквы + ключ выходит из диапазона азбуки, недотягивает до него
                 # и если буква из текста совпадает с буквой из азбуки, то:
@@ -296,7 +295,6 @@ def func_decrypted_vishener(enc_str, key, lang):
     massive = []
     temp_str, temp_str_mass = '', ''
 
-
     if lang == 'Русский':
         dictionary = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
         massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
@@ -321,3 +319,42 @@ def func_decrypted_vishener(enc_str, key, lang):
             temp_str += enc_str[i]
 
     return temp_str
+
+
+def digit_func_count(temp_str):
+    list_numbers = temp_str.split(sep=',')
+
+    out_filter_list_numbers = list(filter(lambda s: s.isdigit() is True or s.lstrip("-").isdigit() is True,
+                                          list_numbers))
+
+    # Сначала поэлементно цифруем, чтобы выйти на условие задачи
+    result_str = list(map(int, out_filter_list_numbers))
+    result_str = list(map(str, result_str))  # Теперь переводим поэлементно в строку
+
+    return result_str
+
+
+def digit_null_count(temp_str):
+    list_numbers = temp_str.split(sep=',')
+
+    out_filter_list_numbers = list(
+        filter(lambda s: s.isdigit() is True, list_numbers))  # Доп проверкуна отрицат не делаем ибо "-" символ
+
+    # Сначала поэлементно цифруем, чтобы выйти на условие задачи
+    result_str = list(map(int, out_filter_list_numbers))
+    result_str = list(map(str, result_str))  # Теперь переводим поэлементно в строку
+
+    return result_str
+
+
+def str_count(temp_str):
+    list_numbers = temp_str.split(sep=',')
+
+    # Проверяем на полином (т.е слово наоборот) и проверяем чтобы это была не 1 буква (ибо она
+    # тоже подойдет под условие)
+    out_filter_list_numbers = list(filter(lambda s: s == s[::-1] and len(s) > 1,list_numbers))
+
+    if len(out_filter_list_numbers) == 0:
+        out_filter_list_numbers = ''
+
+    return out_filter_list_numbers
