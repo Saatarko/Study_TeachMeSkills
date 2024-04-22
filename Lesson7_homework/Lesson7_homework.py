@@ -161,8 +161,8 @@ def get_enter():  # Создаем подкласс (второе окно)
 
     def calculate_area():  # Функция расчета площади через map и reduce
 
-        result_length = list(map(lambda z: z.get('length'), flat_dict))  # Выбирааем из словаря наши длины
-        result_width = list(map(lambda z: z.get('width'), flat_dict))   # Выбирааем из словаря наши ширины
+        result_length = list(map(lambda z: z.get('length'), flat_dict))  # Выбираем из словаря наши длины
+        result_width = list(map(lambda z: z.get('width'), flat_dict))   # Выбираем из словаря наши ширины
 
         room_area = [a * b for a, b in zip(result_length, result_width)]  # Умножаем их получая площадь
         area = reduce(lambda a, b: a + b, room_area)  # Складываем площади через  reduce
@@ -278,7 +278,7 @@ def get_enter():  # Создаем подкласс (второе окно)
                                      borderwidth=2)
     button_flat_count9_tab2.place(x=10, y=270, width=580, height=30)
 
-    text_flat_count4_tab2 = Text(tab2, font='Arial 10', width=15, borderwidth=2, wrap="char", state="disabled")
+    text_flat_count4_tab2 = Text(lesson_7, font='Arial 10', width=15, borderwidth=2, wrap="char", state="disabled")
     text_flat_count4_tab2.place(x=10, y=310, width=580, height=60)
 
     # endregion
