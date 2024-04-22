@@ -1,7 +1,8 @@
 from tkinter import *  # Добавляем библиотеку Ткинтер
 from tkinter import ttk  # Добавляем модуль Ткинтера
-import time
+
 from My_Function import *  # Добавляем библиотеку Function
+from functools import reduce
 
 # region Объявление класса для меню и расчеты окна
 # Объявляем класс
@@ -43,12 +44,12 @@ def get_enter():  # Создаем подкласс (второе окно)
     tab2 = ttk.Frame(tab_control)
 
     tab_control.add(tab1, text='Списки и функции над ними')
-    tab_control.add(tab2, text='Рассчет площади квартиры')
+    tab_control.add(tab2, text='Расчет площади квартиры')
     tab_control.pack(expand=1, fill='both')
 
-    def get_list_deco():
+    def get_list_deco():   # Функция получения данных с меню для формирования списка данных
         temp_str = ''
-        temp_list = entry_list_deco_tab1.get()
+        temp_list = entry_list_deco_tab1.get()   # Проверка на пустые строки
         if temp_list != '':
             temp_str = entry_list_deco2_tab1.get()
             if temp_str != '':
@@ -62,12 +63,10 @@ def get_enter():  # Создаем подкласс (второе окно)
             entry_list_deco2_tab1.insert(END, temp_str)
             entry_list_deco2_tab1.config(state="readonly")
 
+    def timeit(func):    # Функция декоратор для расчета времени
+        import time     # Вызов библиотеки
 
-
-    def timeit(func):
-        import time
-
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs):   # *args, **kwargs - поскольку нам нужны агрументы для передачи
             start = time.time()
             return_value = func(*args, **kwargs)
             end = time.time()
@@ -76,7 +75,7 @@ def get_enter():  # Создаем подкласс (второе окно)
 
         return wrapper
 
-    def data_digit():
+    def data_digit():   # Сбор данных для фильтрации списка
 
         text_list_deco_tab1.config(state="normal")
         text_list_deco_tab1.delete('1.0', END)
@@ -93,7 +92,7 @@ def get_enter():  # Создаем подкласс (второе окно)
         text_list_deco_tab1.insert(END, f'Итоговый список {result_str} был сформирован за время {t:.10f} с')
         text_list_deco_tab1.config(state="disabled")
 
-    def null_filter_func():  # Кнопка очищения полей для списка чисел
+    def null_filter_func():  # Функция для фильтровки списка по числам больше 0
 
         text_list_deco_tab1.config(state="normal")
         text_list_deco_tab1.delete('1.0', END)
@@ -110,7 +109,7 @@ def get_enter():  # Создаем подкласс (второе окно)
         text_list_deco_tab1.insert(END, f'Итоговый список {result_str} был сформирован за время {t:.10f} с')
         text_list_deco_tab1.config(state="disabled")
 
-    def str_filter_func():
+    def str_filter_func():   # Сбор данных для фильтрации списка по строковым данным
 
         text_list_deco_tab1.config(state="normal")
         text_list_deco_tab1.delete('1.0', END)
@@ -122,7 +121,7 @@ def get_enter():  # Создаем подкласс (второе окно)
 
         result_str, t = digit_func(temp_str)  # вызываем отдекорированную функцию принимая уже 2 элемента
 
-        if  result_str == '':
+        if result_str == '':
             text_list_deco_tab1.config(state="normal")
             text_list_deco_tab1.delete('1.0', END)
             text_list_deco_tab1.insert(END, f'Палиндромов не обнаружено, затраченное время {t:.10f} с')
@@ -130,32 +129,48 @@ def get_enter():  # Создаем подкласс (второе окно)
         else:
             text_list_deco_tab1.config(state="normal")
             text_list_deco_tab1.delete('1.0', END)
-            text_list_deco_tab1.insert(END, f'Палиндромы в списке {result_str}. Список был сформирован за время {t:.10f} с')
+            text_list_deco_tab1.insert(END,
+                                       f'Палиндромы в списке {result_str}. Список был'
+                                       f' сформирован за время {t:.10f} с')
             text_list_deco_tab1.config(state="disabled")
 
-
-    def add_flat_room():
+    def add_flat_room():  # Функция добавления новых комнат и их габаритов в словари
 
         temp_name = entry_flat_count3_tab2.get()
         temp_length = entry_flat_count4_tab2.get()
         temp_width = entry_flat_count5_tab2.get()
 
-        temp_length, check_reserve = check_value(temp_length, 'digit')
-        temp_width, check_reserve2 = check_value(temp_width, 'digit')
+        if temp_name == '' or temp_length == '' or temp_width == '':
+            mb.showwarning("Предупреждение", "Не все поля заполннены!!")
+        else:
+            temp_length, check_reserve = check_value(temp_length, 'digit')  # Проверка на число
+            temp_width, check_reserve2 = check_value(temp_width, 'digit')   # Проверка на число
 
-        if check_reserve is True and check_reserve2 is True:
-            room_dist = {'name': temp_name, 'length': temp_length, 'width': temp_width}
-            flat_dict.append(room_dist)
+            if check_reserve is True and check_reserve2 is True:
+                room_dist = {'name': temp_name, 'length': temp_length, 'width': temp_width}  # Формируем словарь
+                flat_dict.append(room_dist)  # Добавляем словарь в список
 
-        entry_flat_count3_tab2.delete(0, END)
-        entry_flat_count4_tab2.delete(0, END)
-        entry_flat_count5_tab2.delete(0, END)
+            entry_flat_count3_tab2.delete(0, END)
+            entry_flat_count4_tab2.delete(0, END)
+            entry_flat_count5_tab2.delete(0, END)
 
-        text_flat_count3_tab2.config(state="normal")
-        text_flat_count3_tab2.delete('1.0', END)
-        text_flat_count3_tab2.insert(END, f' Квартира состоит из{flat_dict}')
-        text_flat_count3_tab2.config(state="disabled")
+            text_flat_count3_tab2.config(state="normal")
+            text_flat_count3_tab2.delete('1.0', END)
+            text_flat_count3_tab2.insert(END, f' Квартира состоит из{flat_dict}')
+            text_flat_count3_tab2.config(state="disabled")
 
+    def calculate_area():  # Функция расчета площади через map и reduce
+
+        result_length = list(map(lambda z: z.get('length'), flat_dict))  # Выбирааем из словаря наши длины
+        result_width = list(map(lambda z: z.get('width'), flat_dict))   # Выбирааем из словаря наши ширины
+
+        room_area = [a * b for a, b in zip(result_length, result_width)]  # Умножаем их получая площадь
+        area = reduce(lambda a, b: a + b, room_area)  # Складываем площади через  reduce
+
+        text_flat_count4_tab2.config(state="normal")
+        text_flat_count4_tab2.delete('1.0', END)
+        text_flat_count4_tab2.insert(END, f' Квартира с комнатами {flat_dict} \n имеет площадь {area}')
+        text_flat_count4_tab2.config(state="disabled")
 
     def clear_data():  # Кнопка очищения полей для списка чисел
 
@@ -163,13 +178,14 @@ def get_enter():  # Создаем подкласс (второе окно)
         entry_list_deco2_tab1.delete(0, END)
         entry_list_deco2_tab1.config(state="readonly")
 
-    def clear_text_data():
+    def clear_text_data():   # Кнопка очищения тектового поля
 
         text_list_deco_tab1.config(state="normal")
         text_list_deco_tab1.delete('1.0', END)
         text_list_deco_tab1.config(state="disabled")
 
-    def on_close():
+    def on_close():   # Кнопка закрытия на крестик
+
         lesson_7_main_menu.destroy()
 
     lesson_7.protocol('WM_DELETE_WINDOW', on_close)
@@ -257,6 +273,13 @@ def get_enter():  # Создаем подкласс (второе окно)
 
     text_flat_count3_tab2 = Text(tab2, font='Arial 10', width=15, borderwidth=2, wrap="char", state="disabled")
     text_flat_count3_tab2.place(x=10, y=200, width=580, height=60)
+
+    button_flat_count9_tab2 = Button(tab2, text='Рассчитать', font='Arial 12 bold ', command=calculate_area,
+                                     borderwidth=2)
+    button_flat_count9_tab2.place(x=10, y=270, width=580, height=30)
+
+    text_flat_count4_tab2 = Text(tab2, font='Arial 10', width=15, borderwidth=2, wrap="char", state="disabled")
+    text_flat_count4_tab2.place(x=10, y=310, width=580, height=60)
 
     # endregion
 

@@ -322,6 +322,9 @@ def func_decrypted_vishener(enc_str, key, lang):
 
 
 def digit_func_count(temp_str):
+    """Функция фильтровки списка и выдача цифровых элементов в виде строк. temp_str - список данных.
+     Возвращает отфильтрованную строку result_str"""
+
     list_numbers = temp_str.split(sep=',')
 
     out_filter_list_numbers = list(filter(lambda s: s.isdigit() is True or s.lstrip("-").isdigit() is True,
@@ -335,10 +338,13 @@ def digit_func_count(temp_str):
 
 
 def digit_null_count(temp_str):
+    """Функция фильтровки списка и выдача цифровых элементов >0 в виде строк . temp_str - список данных.
+     Возвращает отфильтрованную строку result_str"""
+
     list_numbers = temp_str.split(sep=',')
 
     out_filter_list_numbers = list(
-        filter(lambda s: s.isdigit() is True, list_numbers))  # Доп проверкуна отрицат не делаем ибо "-" символ
+        filter(lambda s: s.isdigit() is True, list_numbers))  # Доп проверку на отрицат не делаем ибо "-" символ
 
     # Сначала поэлементно цифруем, чтобы выйти на условие задачи
     result_str = list(map(int, out_filter_list_numbers))
@@ -348,11 +354,14 @@ def digit_null_count(temp_str):
 
 
 def str_count(temp_str):
+    """Функция фильтровки списка и выдача строковых элементов являющихся палиндромом. temp_str - список данных.
+     Возвращает отфильтрованную строку result_str"""
+
     list_numbers = temp_str.split(sep=',')
 
     # Проверяем на полином (т.е слово наоборот) и проверяем чтобы это была не 1 буква (ибо она
     # тоже подойдет под условие)
-    out_filter_list_numbers = list(filter(lambda s: s == s[::-1] and len(s) > 1,list_numbers))
+    out_filter_list_numbers = list(filter(lambda s: s == s[::-1] and len(s) > 1, list_numbers))
 
     if len(out_filter_list_numbers) == 0:
         out_filter_list_numbers = ''
