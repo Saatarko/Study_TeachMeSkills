@@ -51,13 +51,13 @@ def get_enter():  # Создаем подкласс (второе окно)
 
     # region функции основной программы
 
-    def calculate_imt():
+    def calculate_imt():    # Функция для расчета ИМТ
 
         try:
             weight = entry_lab_imt.get()
             height = entry_lab_imt2.get()
             if not weight or not height:
-                raise ExceptionNullField("Одно из полей пустое")
+                raise ExceptionNullField("Одно из полей пустое")   # Генерация ошибки если поле пустое
         except ExceptionNullField:
             mb.showwarning(f"Ошибка,", 'Не все данные заполнены!')
         else:
@@ -65,11 +65,11 @@ def get_enter():  # Создаем подкласс (второе окно)
                 height, check = value_check_func(height)
                 weight, check2 = value_check_func(weight)
                 if check is False or check2 is False:
-                    raise ExceptionStrInNumber("Вместо цифры в поле -строка")
+                    raise ExceptionStrInNumber("Вместо цифры в поле -строка")  # Генерация ошибки если поле строка
                 elif height < 0 or weight < 0:
                     raise ExceptionNegativeNumber("Для данного поля отрицательно число не допустимо")
                 elif height == 0 or weight == 0:
-                    raise ZeroDivisionError("Нулевое значение в цировом поле или деление на 0")
+                    raise ZeroDivisionError("Нулевое значение в цировом поле или деление на 0")  #ошибка деления на 0
             except ExceptionStrInNumber:
                 mb.showwarning(f"Ошибка,", 'Вы ввели не число')
             except ExceptionNegativeNumber:
@@ -80,15 +80,15 @@ def get_enter():  # Создаем подкласс (второе окно)
                 mb.showwarning(f"Ошибка,", 'Рост и вес не могут быть нулевыми')
             else:
 
-                imt = weight / ((height / 100) ** 2)
-                imt_from_dist = list(map(lambda z: z.get('imt'), imt_dict))
-                temp = list(filter(lambda s: s >= imt, imt_from_dist))
-                result_list = list([i for i in imt_dict if i['imt'] == temp[0]])
+                imt = weight / ((height / 100) ** 2)                  # Формула расчета ИМТ
+                imt_from_dist = list(map(lambda z: z.get('imt'), imt_dict))  # Делаем список показателей ИМТ
+                temp = list(filter(lambda s: s >= imt, imt_from_dist))   # Фильтруем по результатам расчета
+                result_list = list([i for i in imt_dict if i['imt'] == temp[0]])   # Достаем конкретный словарь
 
-                result_list_type = list(map(lambda z: z.get('type'), result_list))
+                result_list_type = list(map(lambda z: z.get('type'), result_list))  # Достаем данные из словаря
                 result_list_risk = list(map(lambda z: z.get('risk'), result_list))
 
-                result_list_type = ' '.join(result_list_type)
+                result_list_type = ' '.join(result_list_type)  # Переводиим списки в строки
                 result_list_risk = ' '.join(result_list_risk)
 
                 if result_list_type == 'Дефицит массы тела':
@@ -113,7 +113,7 @@ def get_enter():  # Создаем подкласс (второе окно)
             first_number = entry_lab_imt3.get()
             second_number = entry_lab_imt4.get()
             if not first_number or not second_number:
-                raise ExceptionNullField("Одно из полей пустое")
+                raise ExceptionNullField("Одно из полей пустое")   # Генерация ошибки если поле пустое
         except ExceptionNullField:
             mb.showwarning(f"Ошибка,", 'Не все данные заполнены!')
         else:
@@ -121,7 +121,7 @@ def get_enter():  # Создаем подкласс (второе окно)
                 first_number, check = value_check_func(first_number)
                 second_number, check2 = value_check_func(second_number)
                 if check is False or check2 is False:
-                    raise ExceptionStrInNumber("Вместо цифры в поле -строка")
+                    raise ExceptionStrInNumber("Вместо цифры в поле -строка")   # Генерация ошибки если поле строка
 
             except ExceptionStrInNumber:
                 mb.showwarning(f"Ошибка,", 'Вы ввели не число')
@@ -149,7 +149,7 @@ def get_enter():  # Создаем подкласс (второе окно)
                     text_lab2.config(state="disabled")
 
                 except ZeroDivisionError:
-                    mb.showwarning(f"Ошибка,", 'Делить на 0 нельзя')
+                    mb.showwarning(f"Ошибка,", 'Делить на 0 нельзя')   # Ошибка деления на 0
 
     def on_close():  # Кнопка закрытия на крестик
 
