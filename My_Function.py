@@ -3,7 +3,8 @@ from tkinter import messagebox as mb
 
 
 def check_value(a, func_type):
-    """Функция проверки значений на число type(a)- list, func_type - 'digit' или 'float'"""
+    """Устраревшая (исопльзовалась в 1-7 домашках) Функция
+    проверки значений на число type(a)- list, func_type - 'digit' или 'float'"""
     external_verification = False
     check = False
     list_sizes = ''
@@ -371,21 +372,22 @@ def str_count(temp_str):
 
 
 def value_check_func(a):
+    """Функция проверки на числовые данные"""
     check = False
-    if isinstance(a, int) is True or  isinstance(a, float) is True:
+    if isinstance(a, int) is True or isinstance(a, float) is True:
         check = True
         return a, check
 
     elif a.isdigit() is True or a.lstrip("-").isdigit() is True:
         check = True
-        try:
-            a = int(a)
-        except ValueError:
-            a = float(a)
-
+        a = int(a)
         return a, check
 
-    elif isinstance(a, str):
+    try:
+        a = float(a)
+        check = True
+        return a, check
+    except ValueError:
         check = False
 
     return a, check
