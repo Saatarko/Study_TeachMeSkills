@@ -361,9 +361,31 @@ def str_count(temp_str):
 
     # Проверяем на полином (т.е слово наоборот) и проверяем чтобы это была не 1 буква (ибо она
     # тоже подойдет под условие)
-    out_filter_list_numbers = list(filter(lambda s: s == s[::-1] and len(s) > 1, list_numbers))
+    out_filter_list_numbers = list(filter(lambda s: (s.isdigit() is False or s.lstrip("-").isdigit()
+                                                     is False) and s == s[::-1] and len(s) > 1, list_numbers))
 
     if len(out_filter_list_numbers) == 0:
         out_filter_list_numbers = ''
 
     return out_filter_list_numbers
+
+
+def value_check_func(a):
+    check = False
+    if isinstance(a, int) is True or  isinstance(a, float) is True:
+        check = True
+        return a, check
+
+    elif a.isdigit() is True or a.lstrip("-").isdigit() is True:
+        check = True
+        try:
+            a = int(a)
+        except ValueError:
+            a = float(a)
+
+        return a, check
+
+    elif isinstance(a, str):
+        check = False
+
+    return a, check
