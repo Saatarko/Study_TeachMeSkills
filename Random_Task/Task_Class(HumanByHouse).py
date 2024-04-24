@@ -1,10 +1,9 @@
 from tkinter import *  # Добавляем библиотеку Ткинтер
-from tkinter import ttk    # Добавляем модуль Ткинтера
+from tkinter import ttk  # Добавляем модуль Ткинтера
 from My_Function import *  # Добавляем библиотеку Function
 from importlib import import_module
 
 human_by_house_menu = Tk()
-
 
 human_by_house_menu.title("Домашнее задание по теме 8")
 
@@ -23,6 +22,10 @@ human_by_house_menu.geometry(f"{window_width}x{window_height}+{x}+{y}")
 human_by_house_menu.resizable(None, None)  # Запрещаем изменять размер окна
 human_by_house_menu["bg"] = "gray22"  # gray gray0-99   # Устанавливаем цвет фона
 
+new_human = []  # переменная для хранения человеков
+new_house = []  # переменная для хранения домов
+
+
 class MyException(Exception):
     """Мой класс для исключений"""
 
@@ -39,49 +42,52 @@ class ExceptionNegativeNumber(MyException):
     """Класс для исключений на введение отрицательных чисел """
     pass
 
+
 class Human:
     """Мой класс для челвоеков"""
     # Статические поля (переменные класса)
     default_name = 'Никто'
     default_age = 25
     instances = 0
+
     def __init__(self, name, age):
         # Динамические публичные поля (переменные объекта)
         self.name = name
         self.age = age
 
         # Динамические приватные поля
-        self.__money = 0
-        self.__house = None
-        self.instances += 1
+        self.money = 0
+        self.house = None
+
+    # Метод для регулировки вывода данных в виде текста
+    def __str__(self):
+        return f'Имя: {self.name}, Возраст: {self.age}, Деньги в наличии: {self.money}, Дом: {self.house}'
+
+    # Метод для регулировки вывода данных в виде кода
+    def __repr__(self):
+        return f'(\'{self.name}\', {self.age}, {self.money}, \'{self.house}\')'
 
     # добавляем метод инфо
     def info(self):
         print(f'Имя: {self.name}')
         print(f'Возраст: {self.age}')
-        print(f'Деньги в наличии: {self.__money}')
-        print(f'Дом: {self.__house}')
-
-    # добавляем статический метод
-    @staticmethod
-    def defaultinfo():
-        print(f'Имя по умолчанию: {Human.default_name}')
-        print(f'Возраст по умолчанию: {Human.default_age}')
+        print(f'Деньги в наличии: {self.money}')
+        print(f'Дом: {self.house}')
 
     # Приватный метод
     def __make_deal(self, house, house_price):
         # Динамические публичные поля (переменные объекта)
-        self.__money -= house_price
-        self.__house = house
+        self.money -= house_price
+        self.house = house
 
     def earn_money(self, money):
-        self.__money += money
-        print(f'Заработано: {money}. Итого в наличии {self.__money}')
+        self.money += money
+        print(f'Заработано: {money}. Итого в наличии {self.money}')
 
     def buy_house(self, house, discount):
         price = house.final_price(discount)
-        if self.__money < price:
-            print(f'К сожалению денег на дом не хватает. Нужно еще {price - self.__money}')
+        if self.money < price:
+            print(f'К сожалению денег на дом не хватает. Нужно еще {price - self.money}')
         else:
             self.__make_deal(house, price)
 
@@ -115,8 +121,15 @@ def get_enter():  # Создаем подкласс (второе окно)
     human_by_house.resizable(None, None)
     human_by_house["bg"] = "gray90"
 
-
     # region функции основной программы
+
+    def on_screen_human():
+
+        text_class.config(state="normal")
+        text_class.delete('1.0', END)
+        for human in new_human:
+            text_class.insert(END, f'{human}\n')
+        text_class.config(state="disabled")
 
     def add_human():
 
@@ -137,16 +150,44 @@ def get_enter():  # Создаем подкласс (второе окно)
                 mb.showwarning(f"Ошибка,", 'Вы ввели не число')
 
             else:
-                c = 'Human' + str(Human.instances + 1)
-                instance = getattr(import_module(f'{c}'), Human)('Дениска', 42)
-                setattr(Human, c, age)
-                # print()
 
-                # Deniska = Human('Дениска', 42)
+                new_hum = Human(name, age)
+                new_human.append(new_hum)
 
+                entry_by_house.delete(0, END)
+                entry_by_house2.delete(0, END)
+                on_screen_human()
+                d = repr(new_human)
+                for i in new_human:         # Прогонка по списку в цикле с обращениемк к переменной как к полям класса
+                                                # код верменный всунутьв кнопку
+                    if i.name == 'Alex':
+                        i.earn_money(5000)
+                a = 0
 
     def add_home():
-        pass
+
+        try:
+            house_name = entry_by_house3.get()
+            price = entry_by_house4.get()
+            if not house_name or not price:
+                raise ExceptionNullField("Одно из полей пустое")  # Генерация ошибки если поле пустое
+        except ExceptionNullField:
+            mb.showwarning(f"Ошибка,", 'Не все данные заполнены!')
+        else:
+            try:
+                price, check = value_check_func(price)
+                if check is False:
+                    raise ExceptionStrInNumber("Вместо цифры в поле -строка")  # Генерация ошибки если поле строка
+
+            except ExceptionStrInNumber:
+                mb.showwarning(f"Ошибка,", 'Вы ввели не число')
+
+            else:
+                new_house.append(House(house_name, price))
+                text_class.config(state="normal")
+                text_class.delete('1.0', END)
+                text_class.insert(END, f'{new_house}')
+                text_class.config(state="disabled")
 
     def on_close():  # Кнопка закрытия на крестик
 
@@ -213,13 +254,12 @@ def get_enter():  # Создаем подкласс (второе окно)
     # combobox_tab3 = ttk.Combobox(human_by_house, values = Human.name, state="readonly")
     # combobox_tab3.place(x=10, y=120, width=480, height=30)
 
-
     #
     # button_lab_imt = Button(lesson_8, text='Рассчитать', font='Arial 12 bold ', command=calculate_imt, borderwidth=2)
     # button_lab_imt.place(x=10, y=165, width=580, height=30)
     #
-    # text_lab = Text(lesson_8, font='Arial 10', width=15, borderwidth=2, wrap="word", state="disabled")
-    # text_lab.place(x=10, y=205, width=580, height=100)
+    text_class = Text(human_by_house, font='Arial 10', width=15, borderwidth=2, wrap="word", state="disabled")
+    text_class.place(x=10, y=690, width=580, height=100)
 
     button_exit = Button(human_by_house, text='Выход', font='Arial 12 bold ', command=on_close, borderwidth=2)
     button_exit.place(x=10, y=800, width=580, height=30)
@@ -254,18 +294,18 @@ human_by_house_menu.mainloop()
 
 # endregion
 
-
-if __name__ == '__main__':
-    # Human.defaultinfo()
-    Deniska = Human('Дениска', 42)
-    Deniska.info()
-    Deniska.earn_money(5000)
-    # Human.defaultinfo()
-    # a = 0
-    #
-    lof_house = SmallHouse(15000)
-    Deniska.buy_house(lof_house, 10)
-    #
-    Deniska.earn_money(20000)
-    Deniska.buy_house(lof_house, 10)
-    Deniska.info()
+#
+# if __name__ == '__main__':
+#     # Human.defaultinfo()
+#     Deniska = Human('Дениска', 42)
+#     Deniska.info()
+#     Deniska.earn_money(5000)
+#     # Human.defaultinfo()
+#     # a = 0
+#     #
+#     lof_house = SmallHouse(15000)
+#     Deniska.buy_house(lof_house, 10)
+#     #
+#     Deniska.earn_money(20000)
+#     Deniska.buy_house(lof_house, 10)
+#     Deniska.info()
