@@ -1,6 +1,7 @@
 from tkinter import *  # Добавляем библиотеку Ткинтер
 from tkinter import ttk  # Добавляем модуль Ткинтера
 from My_Function import *  # Добавляем библиотеку Function
+from itertools import groupby
 import csv
 
 human_by_house_menu = Tk()
@@ -260,24 +261,21 @@ def get_enter():  # Создаем подкласс (второе окно)
 
     def on_save():
 
-        with open('list_human.csv', 'w', newline='') as f:
-            csv.writer(f).writerows(Human)
-        with open('list_house.csv', 'w', newline='') as f:
-            csv.writer(f).writerows(Hiuse)
+        with open('list_human.txt', 'w') as text_file:
+            for i in new_human:
+                text_file.writelines(f'{str(i)}')
 
-    def on_load():
+        with open('list_house.txt', 'w') as text_file:
+            for j in new_house:
+                # text_file.writelines(f'{str(j)}\n')
+                text_file.writelines(f'{str(j)}')
 
-        with open('list_human.csv', 'r', newline='') as f:
-            csvreader = csv.reader(f)
-            fields = next(csvreader)
-            for row in csvreader:
-                new_human.append(row)
-
-        with open('list_house.csv', 'r', newline='') as f:
-            csvreader = csv.reader(f)
-            fields = next(csvreader)
-            for row in csvreader:
-                new_house.append(row)
+    # def on_load():
+    #     a = 0
+    #     with open('list_human.txt', 'r') as text_file:
+    #         temp_line = text_file.readlines()
+    #         new_human = temp_line
+    #         on_screen_human()
 
     def on_close():  # Кнопка закрытия на крестик
 
