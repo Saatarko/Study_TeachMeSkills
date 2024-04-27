@@ -372,10 +372,6 @@ def get_enter():  # Создаем подкласс (второе окно)
                          command=on_save, borderwidth=2)
     button_save.place(x=10, y=610, width=580, height=30)
 
-    button_load = Button(human_by_house, text='Загрузить данные из файла', font='Arial 12 bold ',
-                         command=on_load, borderwidth=2)
-    button_load.place(x=10, y=650, width=580, height=30)
-
     button_exit = Button(human_by_house, text='Выход', font='Arial 12 bold ', command=on_close, borderwidth=2)
     button_exit.place(x=10, y=800, width=580, height=30)
 
