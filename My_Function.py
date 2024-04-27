@@ -203,7 +203,7 @@ def func_nod(x, y):
         return func_nod(y, x % y)
 
 
-def func_encryption(enc_str, key, lang, type):
+def func_encryption(enc_str, key, lang, type_func):
     """Функция шифрования и дешифрования по методу Цезаря.enc_str -
     текст для шифрования,key -ключ, lang- язык текста """
     dictionary = dictionary_upper = ''
@@ -249,7 +249,7 @@ def func_encryption(enc_str, key, lang, type):
                     # при этом приводя порядковый номер буквы к диапазону азбуки (зашифрованная буква)
                     result_str.append(temp_dict[(j + key) % len(temp_dict)])
                     break
-    if type == 'caesar':
+    if type_func == 'caesar':
         result_str = ' '.join(result_str)
         result_str = result_str.replace(' ', '')
 
@@ -269,7 +269,7 @@ def func_encrypted_vishener(enc_str, key, lang):
     if lang == 'Русский':
         dictionary = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
         massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
-        print('')
+
     elif lang == 'Английский':
         dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         massive = [func_encryption(dictionary, i, lang, 'vishener') for i in range(len(dictionary))]
