@@ -193,7 +193,7 @@ def get_enter():  # Создаем подкласс (второе окно)
                         stop_text_file = stop_text_file.read()
                         stop_text_file = stop_text_file.split(' ')   # сплитим его на отдельные слова
                     for _text in stop_text_file:  # проверяем наличие слова в стоп листе
-                        regex = fr"{_text}\w"  # создаем регулярку с переменной
+                        regex = fr"{_text}\w?"  # создаем регулярку с переменной
                         temp_str = re.findall(regex, temp_text, re.IGNORECASE)
                         for _word in temp_str:   # прогоняем по циклу и заменяем слова из стоп листа на *
                             temp_change = '*' * len(_word)
