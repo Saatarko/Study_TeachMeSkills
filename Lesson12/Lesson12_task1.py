@@ -1,67 +1,79 @@
-from dataclasses import dataclass, field, asdict
-from typing import List
-import operator
+"""1. Класс «Товар» содержит следующие закрытые поля:
+● Название товара
+● Название магазина, в котором подаётся товар
+● Стоимость товара в рублях
+Класс «Склад» содержит закрытый массив товаров.
+Обеспечить следующие возможности:
+● Вывод информации о товаре со склада по индексу
+● Вывод информации о товаре со склада по имени товара
+● Сортировка товаров по названию, по магазину и по цене
+● Перегруженная операция сложения товаров по цене"""
 
-product = []
+from dataclasses import dataclass    # добавляем библиотеку dataclass
+from typing import List   # добавляем метод List из  библиотеки typing
+import operator           # добавляем библиотеку operator
 
-@dataclass
-class Product:
-    __name: str
+
+@dataclass        # Объявляем класс - датакласом
+class Product:    # добавляем класс товаров
+    __name: str         # Объявляем закрытые поля
     __store_name: str
     __price: int
 
-    def setname(self, name):
-        self.__name = name
-
-    def getname(self):
+    @property                # свойс-во property для доступа к закрытым полям. это геттер(получает значение)
+    def name(self):
         return self.__name
 
-    name = property(getname, setname)
+    @name.setter   # свойс-во property для доступа к закрытым полям. это сеттер(передает значение)
+    def name(self, name):
+        self.__name = name
 
-    def set_store_name(self, store_name):
-        self.__store_name = store_name
-
-    def get_store_name(self):
+    @property  # свойс-во property для доступа к закрытым полям. это геттер(получает значение)
+    def store_name(self):
         return self.__store_name
 
-    store_name = property(get_store_name, set_store_name)
+    @store_name.setter  # свойс-во property для доступа к закрытым полям. это сеттер(передает значение)
+    def store_name(self, store_name):
+        self.__store_name = store_name
 
-    def setprice(self, price):
-        self.__price = price
-
-    def getprice(self):
+    @property    # свойс-во property для доступа к закрытым полям. это геттер(получает значение)
+    def price(self):
         return self.__price
 
-    price = property(getprice, setprice)
+    @price.setter   # свойс-во property для доступа к закрытым полям. это сеттер(передает значение)
+    def price(self, price):
+        self.__price = price
 
-
-
-    def __repr__(self):
+    def __repr__(self):   # метод для отображения данных
         return f'{self.name}  магазина {self.store_name} по цене {self.price}'
 
+    def __add__(self, other):    # перегрузка метода сложения
+        return self.price + other
 
-@dataclass(order=True)
+    def __radd__(self, other):   # доп метод чтобы сложение работало в любом порядке (т.е а+б и б+а)
+        return self.__add__(other)
+
+
+@dataclass(order=True)   # Объявляем класс Магазина как датакласс
 class Store:
-    __list: List[Product]
-    # __list: List[Product] = field(default_factory=make_default_set)
+    __list: List[Product]  # закрытый атрибут в виде списка продуктов
 
-    def setlist(self, temp_list):
-        self.__list = temp_list
-
-    def getlist(self):
+    @property    # свойс-во property для доступа к закрытым полям. это геттер(получает значение)
+    def list(self):
         return self.__list
 
-    list = property(getlist, setlist)
+    @list.setter   # свойс-во property для доступа к закрытым полям. это сеттер(передает значение)
+    def list(self, temp_list):
+        self.__list = temp_list
 
-
-    def __repr__(self):
+    def __repr__(self):    # метод для отображения объекта
         temp = len(self.list)
         temp_list = [f'{self.list[i].name}  магазина {self.list[i].store_name} по цене {self.list[i].price}\n'
                      for i in range(temp)]
         set_str = 'На складе есть: ' + ' '.join(temp_list)
         return set_str
 
-    def sorted(self, sort_field):
+    def sorted(self, sort_field):  # метод для сортировки списка с экземплярами класса (по любому из полей)
         if sort_field == 'name':
             print(f'Итог сортировки по имени: {sorted(self.__list, key=operator.attrgetter("name"))}')
         elif sort_field == 'store_name':
@@ -69,30 +81,45 @@ class Store:
         elif sort_field == 'price':
             print(f'Итог сортировки по цене: {sorted(self.__list, key=operator.attrgetter("price"))}')
 
-    def get_by_name(self):
+    def __getitem__(self, item):   # метод упрощения поиска по индексу
+        return self.list[item]
+
+    def get_by_value(self, value):  # метод для поиска по значению
+        for i in self.list:
+            f = operator.attrgetter('name')
+            if f(i) == value:
+                return i
 
 
-product.append(Product('zrill', '21Vek', 500))
-product.append(Product('Teapot', 'Electosila', 500))
-product.append(Product('dildo', 'Sexshop', 150))
-product.append(Product('pan', '21Vek', 26))
+def get_sum():   # функция для сложения цен элементов склада
+    c = 0
+    for i in my_store.list:
+        c += i
 
-# my_store = Store([zrill, teapot, dildo, pan])
+    return c
 
-my_store = Store(product)
 
-print(my_store.list[0])
-print(my_store.list[1])
-print(my_store.list[2])
-print(f'{my_store.list[3]}\n')
+zrill = Product('zrill', '21Vek', 500)     # создание элементов класса товаров
+teapot = Product('Teapot', 'Electosila', 500)
+dildo = Product('dildo', 'Sexshop', 150)
+pan = Product('pan', '21Vek', 26)
 
-# print(zrill)
-# print(teapot)
-# print(f'{dildo}\n')
+my_store = Store([zrill, teapot, dildo, pan])  # создание элемента класса склада
 
-print(my_store)
+print(my_store[0])     # Вывод данных по индексу
+print(my_store[1])
+print(my_store[2])
+print(f'{my_store[3]}\n')
 
-my_store.sorted('name')
+
+code_goods = my_store.get_by_value('Teapot')  # Вывод данных по имени товара
+print(f'Поиск по имени товара: {code_goods}\n')
+
+
+my_store.sorted('name')    # Вывод сортировок
 my_store.sorted('store_name')
 my_store.sorted('price')
+print('\n')
 
+
+print(f'Сумма цен всех товаров на складе будет {get_sum()}')    # Вывод общей суммы
