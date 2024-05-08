@@ -25,11 +25,9 @@ class Bus:
     dict_seats: dict = field(init=False)
 
     def __post_init__(self):
-        # temp = [i for i in range(0, len(self.pass_last_name))]
-        #
-        # self.dict_seats = {key: temp for key in self.pass_last_name}
+        temp = [i for i in range(0, len(self.pass_last_name))]
+        self.dict_seats = dict(zip(self.pass_last_name, temp))
 
-        self.dict_seats = dict.fromkeys(range(len(self.pass_last_name)), self.pass_last_name)  # нао думиать
         if len(self.pass_last_name) <= self.max_seats:
             self.free_seats = True
         else:
