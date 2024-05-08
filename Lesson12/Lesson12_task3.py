@@ -39,28 +39,29 @@ class Bus:
 
     @name_list.setter  # делаем метод для проверки значения скорости после изменения.Это сеттер
     def name_list(self, value):
-        if len(self.pass_last_name + value) > self.max_seats:
-            zero_people = self.pass_last_name + value - self.max_seats
-            print(f'Всем людям места не хватило, остались {zero_people}')
-            value = value[0, -zero_people]
-        else:
-            self.pass_last_name += value
-        if set(value).issubset(self.pass_last_name) is True:
-            self.pass_last_name -= value
-        else:
-            raise 'Несоответствущий список пассажиров или мест'
+        if len(value) > self.max_seats:
+            zero_people = len(value) - self.max_seats
+            temp = value[-zero_people:]
+            print(f'Всем людям места не хватило, остались {zero_people} человек(а) - {temp}')
+            self.pass_last_name = value[0: -zero_people]
+        temp_list = self.dict_seats.values()
+        temp_list = [x for x in range(0,self.max_seats) if x not in temp_list]
+
+    # def __isub__(self, other):
+    #     self.pass_last_name = [x for x in self.pass_last_name if x not in other]
 
     def change_pass_status(self, in_out, name: list):
         if in_out == 'вход':
-            self.pass_last_name += name
+            self.name_list += name
         elif in_out == 'выход':
-            result = [x for x in name if x not in self.pass_last_name]
+            try:
+                if set(name).issubset(self.pass_last_name) is True:
+                    self.pass_last_name = [x for x in self.pass_last_name if x not in name]
 
-    def get_in(self):
-        pass
-
-    def get_out(self):
-        pass
+                else:
+                    raise TypeError
+            except TypeError:
+                print(f'Не все указанные в списке {name} есть в автобусе')
 
     @property  # делаем метод для проверки значения скорости после изменения.Это геттер
     def speed(self):
@@ -82,10 +83,19 @@ class Bus:
             self.speed -= value
 
 
-bus = Bus(60, 50, 120, ['денис сергеев', 'антуан попов', 'фекла копытная'])
+# bus = Bus(60, 4, 120, ['денис сергеев', 'антуан попов', 'фекла копытная'])
+bus = Bus(60, 5, 120, ['денис сергеев', 'антуан попов', 'фекла копытная'])
 bus.change_speed('увеличить', 20)  # проверка метода изменения скорости
 print(f'{bus}\n')
 bus.change_speed('увеличить', 150)
 print(f'{bus}\n')
 bus.change_speed('уменьшить', 180)
 print(f'{bus}\n')
+
+bus.change_pass_status('вход', ['александр пушкин', 'сергей есенин'])
+print(f'{bus.pass_last_name}\n')
+
+bus.change_pass_status('выход', ['фекла копытная', 'антуан попов'])
+print(f'{bus.pass_last_name}\n')
+
+bus.change_pass_status('выход', ['свинорыл'])
