@@ -21,11 +21,19 @@ class Bus:
     max_seats: int
     max_speed: int
     pass_last_name: list
-    free_seats: bool
+    free_seats: bool = field(init=False)
     dict_seats: dict = field(init=False)
 
     def __post_init__(self):
-        dict_seats = dict.fromkeys(self.pass_last_name)
+        # temp = [i for i in range(0, len(self.pass_last_name))]
+        #
+        # self.dict_seats = {key: temp for key in self.pass_last_name}
+
+        self.dict_seats = dict.fromkeys(range(len(self.pass_last_name)), self.pass_last_name)  # нао думиать
+        if len(self.pass_last_name) <= self.max_seats:
+            self.free_seats = True
+        else:
+            raise 'Пассажиров больше чем мест. Автобус никуда не поедет'
 
     @property  # делаем метод для проверки значения скорости после изменения.Это геттер
     def name_list(self):
@@ -43,7 +51,6 @@ class Bus:
             self.pass_last_name -= value
         else:
             raise 'Несоответствущий список пассажиров или мест'
-
 
     def change_pass_status(self, in_out, name: list):
         if in_out == 'вход':
@@ -75,3 +82,12 @@ class Bus:
             self.speed += value
         elif vector == 'уменьшить':
             self.speed -= value
+
+
+bus = Bus(60, 50, 120, ['денис сергеев', 'антуан попов', 'фекла копытная'])
+bus.change_speed('увеличить', 20)  # проверка метода изменения скорости
+print(f'{bus}\n')
+bus.change_speed('увеличить', 150)
+print(f'{bus}\n')
+bus.change_speed('уменьшить', 180)
+print(f'{bus}\n')
