@@ -5,6 +5,8 @@ from telebot import types  # Импортируем метод types (для к�
 from telebot.types import ReplyKeyboardRemove  # Импортируем метод для удаления кнопок
 
 new_human = []  # Наш список для хранения данных по человекам
+eho_flag = False
+podbor_flag = False
 
 
 class Human:  # Класс человеков
@@ -22,35 +24,62 @@ bot = telebot.TeleBot('6574088819:AAGCI0fWRLqQx033FKAZ9qWvTzx16SEH-Z8')
 # Функция, обрабатывающая команду /start
 @bot.message_handler(commands=["start"])
 def start(message, res=False):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Создаем кнопки с запросом корректности данных
-    item1 = types.KeyboardButton("Готов")
-    item2 = types.KeyboardButton("Не готов")
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Создаем кнопки с выбором типа программы
+    item1 = types.KeyboardButton("Эхо-бот")
+    item2 = types.KeyboardButton("Подбор машины-бот")
     markup.add(item1, item2)
 
-    bot.send_message(message.chat.id, text=f'Вас приветствует дикий ИскИн. Если Вы будете вести себя хорошо'
-                                           f' я помогу Вам подобрать машину исходя из нужной Вам марки и '
-                                           f'имеющихся у Вас денег! Если Вы готовы жмите кнопку готов )',
+    bot.send_message(message.chat.id, text=f'Вас приветствует дикий ИскИн. Если Вы будете вести себя хорошо, '
+                                           f'то мы можем поиграть в игру Эхо (я буду повторять ваши слова) или '
+                                           f'же я могу подобрать для Вас машину исходя из Ваших требований',
                      reply_markup=markup)  # Высылаем сообщение пользователю и рисуем кнопки
 
 
 # Получение сообщений от юзера
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(content_types=['text'])   # метод реакции на текст
 def get_text_messages(message):
-    if message.text == "Готов" or message.text == 'Неверно':
+    global eho_flag, podbor_flag
 
-        bot.send_message(message.from_user.id, text="Для формирования списка ответьте на несколько вопросов!",
-                         reply_markup=ReplyKeyboardRemove())
-        message = bot.reply_to(message, 'Введите Ваше имя и Фамилию!')
-        bot.register_next_step_handler(message, process_name_step)
-    elif message.text == 'Верно':  # Ответ по кнопке
-        link = get_link(new_human[-1].car, new_human[-1].money)
-        bot.send_message(message.chat.id, 'Загружаем сайт в соответствии с Вашими запросами')
-        bot.send_message(message.chat.id, f'{link}')
-        bot.send_message(message.chat.id, text='Спасибо за пользование программой', reply_markup=ReplyKeyboardRemove())
+    if eho_flag is True:  # Если включен эхо-бот
 
-        bot.send_message(chat_id=-4266542112, text=f'Был  сформирован запрос от '
-                                                   f'{new_human[-1].name} на машину {new_human[-1].car} с '
-                                                   f'максимальной суммой {new_human[-1].money}')
+        bot.send_message(message.chat.id, message.text)    # повторяем сообщения
+    elif message.text == "Эхо-бот":
+        eho_flag = True
+        podbor_flag = False
+        bot.send_message(message.chat.id, text='Загружен Эхо-бот. Он же бот повторяка. Пробуйте',
+                         reply_markup=ReplyKeyboardRemove())  # Удаляем кнопки
+    elif message.text == "Подбор машины-бот":
+        podbor_flag = True
+        eho_flag = False
+        # bot.send_message(message.chat.id, text='Загружен модуль подбора машины',
+        #                  reply_markup=ReplyKeyboardRemove())  # Удаляем кнопки
+
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Создаем кнопки с выбором
+        item1 = types.KeyboardButton("Готов")
+        item2 = types.KeyboardButton("Не готов")
+        markup.add(item1, item2)
+
+        bot.send_message(message.chat.id, text=f'Загружен модуль подбора машины. Если Вы готовы. То давайте '
+                                               f'приступим к подбору! Жмите готов! )',
+                         reply_markup=markup)
+
+    if podbor_flag is True:   # Если включен подбор. Запрашиваем доп данные
+
+        if message.text == "Готов" or message.text == 'Неверно':
+            bot.send_message(message.from_user.id, text="Для формирования списка ответьте на несколько вопросов!",
+                             reply_markup=ReplyKeyboardRemove())
+            message = bot.reply_to(message, 'Введите Ваше имя и Фамилию!')
+            bot.register_next_step_handler(message, process_name_step)
+        elif message.text == 'Верно' and podbor_flag is True:  # Ответ по кнопке
+            link = get_link(new_human[-1].car, new_human[-1].money)
+            bot.send_message(message.chat.id, 'Загружаем сайт в соответствии с Вашими запросами')
+            bot.send_message(message.chat.id, f'{link}')
+            bot.send_message(message.chat.id, text='Спасибо за пользование программой',
+                             reply_markup=ReplyKeyboardRemove())
+
+            bot.send_message(chat_id=-4266542112, text=f'Был  сформирован запрос от '
+                                                       f'{new_human[-1].name} на машину {new_human[-1].car} с '
+                                                       f'максимальной суммой {new_human[-1].money}')
 
 
 def process_name_step(message):  # Функция пошагового запроса для получения данных (ФИО)
@@ -86,7 +115,7 @@ def process_car_step(message):  # Функция пошагового запро
             message = bot.reply_to(message, 'Марка машины из цифр -  что-то новое! Попробуйте ввести еще раз!')
             bot.register_next_step_handler(message, process_car_step)
             return
-        elif not re.search(r'[а-яё]{2,}(\s[а-яё]{2,})?', car.lower()):
+        elif not re.search(r'[а-яёa-z]{2,}(\s[а-яёa-z]{2,})?', car.lower()):
             message = bot.reply_to(message, 'То что вы написали, не очень похоже на марку машины. Попробуйте '
                                             'ввести еще раз!')
             bot.register_next_step_handler(message, process_car_step)
@@ -154,3 +183,4 @@ def get_link(car, money):  # Функция подготовки ссылки н
 
 # Запускаем бота
 bot.polling(none_stop=True, interval=0)
+
