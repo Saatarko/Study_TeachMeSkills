@@ -10,7 +10,6 @@ podbor_flag = False
 
 
 class Human:  # Класс человеков
-
     def __init__(self, name='Иван Иванов', car='Volvo', money=0):  # Инициализируем и задаем значения по умолчанию
         self.name = name
         self.car = car
@@ -36,13 +35,13 @@ def start(message, res=False):
 
 
 # Получение сообщений от юзера
-@bot.message_handler(content_types=['text'])   # метод реакции на текст
+@bot.message_handler(content_types=['text'])  # метод реакции на текст
 def get_text_messages(message):
     global eho_flag, podbor_flag
 
     if eho_flag is True:  # Если включен эхо-бот
 
-        bot.send_message(message.chat.id, message.text)    # повторяем сообщения
+        bot.send_message(message.chat.id, message.text)  # повторяем сообщения
     elif message.text == "Эхо-бот":
         eho_flag = True
         podbor_flag = False
@@ -51,19 +50,21 @@ def get_text_messages(message):
     elif message.text == "Подбор машины-бот":
         podbor_flag = True
         eho_flag = False
-        # bot.send_message(message.chat.id, text='Загружен модуль подбора машины',
-        #                  reply_markup=ReplyKeyboardRemove())  # Удаляем кнопки
+        bot.send_message(message.chat.id, text='Загружен модуль подбора машины',
+                         reply_markup=ReplyKeyboardRemove())  # Удаляем кнопки
+        message.text = "Готов"
+        # get_text_messages(message)
+
+    if podbor_flag is True:  # Если включен подбор. Запрашиваем доп данные
 
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Создаем кнопки с выбором
         item1 = types.KeyboardButton("Готов")
         item2 = types.KeyboardButton("Не готов")
         markup.add(item1, item2)
 
-        bot.send_message(message.chat.id, text=f'Загружен модуль подбора машины. Если Вы готовы. То давайте '
-                                               f'приступим к подбору! Жмите готов! )',
+        bot.send_message(message.chat.id, text=f'Если Вы готовы. То давайте '
+                                               f'приступим к подбору!  )',
                          reply_markup=markup)
-
-    if podbor_flag is True:   # Если включен подбор. Запрашиваем доп данные
 
         if message.text == "Готов" or message.text == 'Неверно':
             bot.send_message(message.from_user.id, text="Для формирования списка ответьте на несколько вопросов!",
@@ -92,7 +93,7 @@ def process_name_step(message):  # Функция пошагового запр�
             message = bot.reply_to(message, 'Имя и Фамилия из цифр -  что-то новое! Попробуйте ввести еще раз!')
             bot.register_next_step_handler(message, process_name_step)
             return
-        elif not re.search(r'[а-яё]{2,}\s[а-яё]{2,}', name.lower()):
+        elif not re.search(r'[а-яёa-z]{2,}\s[а-яёa-z]{2,}', name.lower()):
             message = bot.reply_to(message, 'То что вы написали, не очень похоже на Имя и Фамилию')
             bot.register_next_step_handler(message, process_name_step)
             return
@@ -183,4 +184,3 @@ def get_link(car, money):  # Функция подготовки ссылки н
 
 # Запускаем бота
 bot.polling(none_stop=True, interval=0)
-
