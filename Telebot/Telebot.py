@@ -50,15 +50,12 @@ def info(message):
 
 def process_pass_step(message):
     count = 0
-    while count < 5:
-        if message.text == '32167':
-            db_read(message)
-            break
-        else:
-            bot.send_message(message.chat.id, text=f'К сожалению пароль неправильный. Попробуйте еще раз!')
-            count += 1
-    if count >= 4:
-        bot.send_message(message.chat.id, text=f'Попытки закончились. Держи Бан. (шутка)')
+
+    if message.text == '32167':
+        db_read(message)
+
+    else:
+        bot.send_message(message.chat.id, text=f'К сожалению пароль неправильный. Попробуйте еще раз!')
 
 
 # Получение сообщений от юзера
@@ -284,7 +281,6 @@ def db_work():  # Функция для добавления данных в SQL
 
 
 def db_read(message):
-
     try:
         connection = sq.connect("people.db")
 
@@ -320,7 +316,8 @@ def db_read(message):
         connection.close()
 
     except Exception:
-        bot.send_message(message.chat.id, text=f'Запросов пока  небыло')  # Высылаем сообщение пользователю и рисуем кнопки
+        bot.send_message(message.chat.id,
+                         text=f'Запросов пока  небыло')  # Высылаем сообщение пользователю и рисуем кнопки
 
 
 # Запускаем бота
