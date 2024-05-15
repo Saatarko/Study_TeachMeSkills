@@ -3,6 +3,9 @@ import re
 import telebot  # Импортируем библиотеку для телеботов
 from telebot import types  # Импортируем метод types (для кнопок)
 from telebot.types import ReplyKeyboardRemove  # Импортируем метод для удаления кнопок
+import sqlite3 as sq
+
+from typing import List
 
 new_human = []  # Наш список для хранения данных по человекам
 eho_flag = False
@@ -14,6 +17,11 @@ class Human:  # Класс человеков
         self.name = name
         self.car = car
         self.money = money
+
+    def __iter__(self):  # НА запрос делаем итерированный кортеж
+        _list = (self.name, self.car, int(self.money))
+        it = iter(_list)
+        return it
 
 
 # Создаем экземпляр бота
@@ -32,6 +40,25 @@ def start(message, res=False):
                                            f'то мы можем поиграть в игру Эхо (я буду повторять ваши слова) или '
                                            f'же я могу подобрать для Вас машину исходя из Ваших требований',
                      reply_markup=markup)  # Высылаем сообщение пользователю и рисуем кнопки
+
+
+@bot.message_handler(commands=["info"])
+def info(message):
+    message = bot.reply_to(message, 'Для просмотра списка введите пожалуйста пароль')
+    bot.register_next_step_handler(message, process_pass_step)
+
+
+def process_pass_step(message):
+    count = 0
+    while count < 5:
+        if message.text == '32167':
+            db_read(message)
+            break
+        else:
+            bot.send_message(message.chat.id, text=f'К сожалению пароль неправильный. Попробуйте еще раз!')
+            count += 1
+    if count >= 4:
+        bot.send_message(message.chat.id, text=f'Попытки закончились. Держи Бан. (шутка)')
 
 
 # Получение сообщений от юзера
@@ -77,6 +104,8 @@ def get_text_messages(message):
             bot.send_message(message.chat.id, f'{link}')
             bot.send_message(message.chat.id, text='Спасибо за пользование программой',
                              reply_markup=ReplyKeyboardRemove())
+
+            db_open()
 
             bot.send_message(chat_id=-4266542112, text=f'Был  сформирован запрос от '
                                                        f'{new_human[-1].name} на машину {new_human[-1].car} с '
@@ -180,6 +209,118 @@ def get_link(car, money):  # Функция подготовки ссылки н
     else:
         temp_link = 'Точного совпадения по марке машины не найдено. Поэтому просто ссылка на сайт https://cars.av.by'
     return temp_link
+
+
+def db_open():  # Функция создания таблицы в SQL
+
+    # Подключение или создание базы данных
+
+    connection = sq.connect("people.db")
+
+    # Получение объекта курсора для выполнения операций с базой данных
+    cursor = connection.cursor()
+
+    # SQL-запрос для создания таблицы
+
+    create_table_query = """
+
+    CREATE TABLE IF NOT EXISTS people (
+
+    id INTEGER PRIMARY KEY,
+    
+    name Text NOT NULL,
+
+    car TEXT NOT NULL,
+
+    money INTEGER
+
+    );
+
+    """
+
+    # Выполнение SQL-запроса для создания таблицы
+
+    cursor.execute(create_table_query)
+
+    # Закрытие курсора
+
+    cursor.close()
+
+    connection.close()
+
+    # Вызов функции добавления данных в SQL
+    db_work()
+
+
+def db_work():  # Функция для добавления данных в SQL
+
+    # Подключение или создание базы данных
+
+    connection = sq.connect("people.db")
+
+    cursor = connection.cursor()
+
+    # SQL-запрос для вставки данных
+
+    insert_query = """
+
+    INSERT INTO people (name, car, money) VALUES (?, ?, ?);
+
+    """
+    # Итерируем наш класс вызывая соответвующий метод. И затем  переводим его в список ибо
+    # по умолчанию __iter__ возвращает кортеж, а sql жрет только списки
+    cursor.execute(insert_query, list(iter(new_human[-1])))
+
+    # Сохранение изменений (commit)
+
+    connection.commit()
+
+    # Закрытие курсора
+    cursor.close()
+
+    # Закрытие соединения с базой данных
+
+    connection.close()
+
+
+def db_read(message):
+
+    try:
+        connection = sq.connect("people.db")
+
+        cursor = connection.cursor()
+
+        # SQL-запрос для извлечения данных
+
+        select_query = """
+    
+        SELECT * FROM people;
+    
+        """
+
+        # Выполнение SQL-запроса для извлечения данных
+
+        cursor.execute(select_query)
+
+        # Получение всех данных
+
+        data = cursor.fetchall()
+
+        # Вывод данных
+
+        for row in data:
+            bot.send_message(message.chat.id, text=f'{row}')
+
+        # Закрытие курсора (опционально, но рекомендуется)
+
+        cursor.close()
+
+        # Закрытие соединения с базой данных
+
+        connection.close()
+
+    except Exception:
+        bot.send_message(message.chat.id, text=f'Запросов пока  небыло')  # Высылаем сообщение пользователю и рисуем кнопки
 
 
 # Запускаем бота
