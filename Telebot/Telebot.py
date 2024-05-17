@@ -11,6 +11,8 @@ new_human = []  # Наш список для хранения данных по 
 eho_flag = False
 podbor_flag = False
 
+letters = 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя-'
+
 
 class Human:  # Класс человеков
     def __init__(self, name='Иван Иванов', car='Volvo', money=0):  # Инициализируем и задаем значения по умолчанию
@@ -114,15 +116,24 @@ def process_name_step(message):  # Функция пошагового запр�
 
         name = message.text
 
+
         if not isinstance(name, str):  # Проверка на то что бы ФИо были строкой
 
             message = bot.reply_to(message, 'Имя и Фамилия из цифр -  что-то новое! Попробуйте ввести еще раз!')
             bot.register_next_step_handler(message, process_name_step)
             return
-        elif not re.search(r'[а-яёa-z]{2,}\s[а-яёa-z]{2,}', name.lower()):
-            message = bot.reply_to(message, 'То что вы написали, не очень похоже на Имя и Фамилию')
+        temp_name = name.lower()
+        temp_name = temp_name.split()
+        if len(temp_name) < 2:
+            message = bot.reply_to(message, 'Имя и Фамилия состоят минимум из 2 слов')
             bot.register_next_step_handler(message, process_name_step)
             return
+
+        for s in temp_name:
+            if len(s.strip(letters)) != 0:
+                message = bot.reply_to(message, 'В Имени и Фамилии допустимы только буквы!')
+                bot.register_next_step_handler(message, process_name_step)
+                return
 
         user = Human(name)  # Создаем элемент класса
         new_human.append(user)  # Загоняем эк в список
@@ -142,11 +153,13 @@ def process_car_step(message):  # Функция пошагового запро
             message = bot.reply_to(message, 'Марка машины из цифр -  что-то новое! Попробуйте ввести еще раз!')
             bot.register_next_step_handler(message, process_car_step)
             return
-        elif not re.search(r'[а-яёa-z]{2,}(\s[а-яёa-z]{2,})?', car.lower()):
-            message = bot.reply_to(message, 'То что вы написали, не очень похоже на марку машины. Попробуйте '
-                                            'ввести еще раз!')
-            bot.register_next_step_handler(message, process_car_step)
-            return
+        temp_car = car.lower()
+
+        for s in temp_car:
+            if len(s.strip(letters)) != 0:
+                message = bot.reply_to(message, 'В названии машины допустимы только буквы!')
+                bot.register_next_step_handler(message, process_car_step)
+                return
 
         new_human[-1].car = car  # Экземпляр класса уже есть и в списке. Присваиваем ему новое авто
         message = bot.reply_to(message, 'Сколько у Вас денег для покупки?')
