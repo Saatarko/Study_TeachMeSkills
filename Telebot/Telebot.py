@@ -5,7 +5,6 @@ from telebot import types  # Импортируем метод types (для к�
 from telebot.types import ReplyKeyboardRemove  # Импортируем метод для удаления кнопок
 import sqlite3 as sq
 
-from typing import List
 
 new_human = []  # Наш список для хранения данных по человекам
 eho_flag = False
