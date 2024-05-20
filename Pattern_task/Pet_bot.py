@@ -17,6 +17,7 @@ letters = 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрсту�
 bot = telebot.TeleBot('6845881716:AAHaObSsf-NRYaIuBGnnUqzW2iLugNfFHaE')
 
 
+
 # Функция, обрабатывающая команду /start
 @bot.message_handler(commands=["start"])
 def start(message, res=False):
