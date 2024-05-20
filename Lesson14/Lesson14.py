@@ -23,9 +23,11 @@ import psycopg2 as ps
 
 
 def create_table():  # Функция создлания таблицы
+
+    # Сначала удаляем таблицу (если она есть)
     del_table = """
     
-    DROP TABLE IF EXISTS employees
+    DROP TABLE IF EXISTS employees   
      
     """
 
@@ -44,6 +46,8 @@ def create_table():  # Функция создлания таблицы
                 """
 
     cursor.execute(create_table_query)
+
+
 
 
 def add_row_table():  # Функция для добавления данных в SQL
@@ -169,6 +173,8 @@ def avg_sal():  # Функция подсчета средней зп
 conn = ps.connect(dbname="postgres", user="postgres", password="Almalexia8675309", host="127.0.0.1", port="5433")
 
 cursor = conn.cursor()
+
+conn.autocommit = True
 
 create_table()
 add_row_table()
