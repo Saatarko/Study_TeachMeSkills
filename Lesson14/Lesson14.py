@@ -22,7 +22,7 @@
 import psycopg2 as ps
 
 
-def create_table():
+def create_table():  # Функция создлания таблицы
     del_table = """
     
     DROP TABLE IF EXISTS employees
@@ -66,7 +66,7 @@ def add_row_table():  # Функция для добавления данных 
     conn.commit()
 
 
-def db_read():
+def db_read():  # Функция чтения данных из таблицы
     select_query = """
 
         SELECT * FROM employees;
@@ -89,7 +89,7 @@ def db_read():
     print(a)
 
 
-def update():
+def update():  # Функция обновления данных в таблице
     select_query = """
 
             UPDATE employees SET Position = 'Менеджер' WHERE Position = 'Уборщик'
@@ -98,7 +98,7 @@ def update():
     cursor.execute(select_query)
 
 
-def add_column():
+def add_column():  # Функция добавления столбца
     add_query = """
 
                 ALTER TABLE employees
@@ -108,7 +108,7 @@ def add_column():
     cursor.execute(add_query)
 
 
-def update_date():
+def update_date():  # Функция заполнения нового столбца новыми данными
     select_query = """
 
             UPDATE employees SET HireDate = '2022-12-31' WHERE HireDate = '2020-01-01'
@@ -117,7 +117,7 @@ def update_date():
     cursor.execute(select_query)
 
 
-def manager_search():
+def manager_search():  # Функция поиска менеджеров
     select_query = """
 
             SELECT name, Position, Department, Salary FROM employees WHERE Position = 'Менеджер'
@@ -135,7 +135,7 @@ def manager_search():
     print(a)
 
 
-def salarity_search():
+def salarity_search():  # Функция поиска тех укого большая зп
     select_query = """
 
             SELECT name, Position, Department, Salary FROM employees WHERE Salary >= 5000
@@ -152,7 +152,8 @@ def salarity_search():
 
     print(a)
 
-def avg_sal():
+
+def avg_sal():  # Функция подсчета средней зп
     select_query = """
 
                 SELECT AVG(Salary) AS Average_Price FROM employees;
