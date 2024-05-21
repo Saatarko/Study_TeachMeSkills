@@ -22,13 +22,6 @@
 import psycopg2 as ps
 
 
-def create_database(name):
-    conn.autocommit = True
-
-    create_database_query = "CREATE DATABASE %s", (f'{name}',)
-    create_database(create_database_query)
-
-
 def create_table():  # Функция создлания таблицы
 
     # Сначала удаляем таблицу (если она есть)
@@ -101,40 +94,23 @@ def db_read():  # Функция чтения данных из таблицы
 
 
 def update():  # Функция обновления данных в таблице
-    select_query = """
 
-            UPDATE employees SET Position = %s WHERE Position = %s, ('Менеджер','Уборщик')
-
-            """
-    cursor.execute(select_query)
+    cursor.execute("UPDATE employees SET Position =%s WHERE Position=%s", ("Менеджер", "Уборщик"))
 
 
 def add_column():  # Функция добавления столбца
-    add_query = """
 
-                ALTER TABLE employees
-                ADD COLUMN IF NOT EXISTS HireDate Date DEFAULT %s, ('2020-01-01')
-
-                """
-    cursor.execute(add_query)
+    cursor.execute("ALTER TABLE employees ADD COLUMN IF NOT EXISTS HireDate Date DEFAULT=%s", '2020-01-01')
 
 
 def update_date():  # Функция заполнения нового столбца новыми данными
-    select_query = """
 
-            UPDATE employees SET HireDate =%s  WHERE HireDate =%s, ('2022-12-31', '2020-01-01')
-
-            """
-    cursor.execute(select_query)
+    cursor.execute("UPDATE employees SET HireDate =%s  WHERE HireDate =%s", '2020-01-01')
 
 
 def manager_search():  # Функция поиска менеджеров
-    select_query = """
 
-            SELECT name, Position, Department, Salary FROM employees WHERE Position =%s, ('Менеджер')
-
-            """
-    cursor.execute(select_query)
+    cursor.execute("SELECT name, Position, Department, Salary FROM employees WHERE Position =%s", 'Менеджер')
 
     data = cursor.fetchall()
 
@@ -147,12 +123,8 @@ def manager_search():  # Функция поиска менеджеров
 
 
 def salarity_search():  # Функция поиска тех у кого большая зп
-    select_query = """
 
-            SELECT name, Position, Department, Salary FROM employees WHERE Salary >= 5000
-
-            """
-    cursor.execute(select_query)
+    cursor.execute("SELECT name, Position, Department, Salary FROM employees WHERE Salary >= 5000")
 
     data = cursor.fetchall()
 
@@ -165,12 +137,8 @@ def salarity_search():  # Функция поиска тех у кого бол�
 
 
 def avg_sal():  # Функция подсчета средней зп
-    select_query = """
 
-                SELECT AVG(Salary) AS Average_Salary FROM employees;
-
-                """
-    cursor.execute(select_query)
+    cursor.execute("SELECT AVG(Salary) AS Average_Salary FROM employees")
 
     data = cursor.fetchall()
 
@@ -182,25 +150,6 @@ conn = ps.connect(dbname="postgres", user="postgres", password="Almalexia8675309
 
 cursor = conn.cursor()
 
-# Создаем новую базу данных
-
-create_database('my_db')
-
-# Закрытие курсора
-cursor.close()
-
-# Закрытие соединения с базой данных
-
-conn.close()
-
-# Соединяемся с новой базой данных
-
-
-conn = ps.connect(dbname="postgres", user="postgres", password="Almalexia8675309", host="127.0.0.1", port="5433")
-
-cursor = conn.cursor()
-
-conn.autocommit = True
 
 create_table()
 add_row_table()
