@@ -25,13 +25,8 @@ import psycopg2 as ps
 def create_table():  # Функция создлания таблицы
 
     # Сначала удаляем таблицу (если она есть)
-    del_table = """
-    
-    DROP TABLE IF EXISTS employees   
-     
-    """
 
-    cursor.execute(del_table)
+    cursor.execute("DROP TABLE IF EXISTS employees")
 
     create_table_query = """
 
