@@ -83,5 +83,8 @@ class SyncORM:
             )
             # длеаем так чтобы в консоль выводился так же как SQL запрос
             print(query.compile(compile_kwargs={'literal_binds': True}))
+            res = session.execute(query)
+            result = res.all()
+            print(result)
 
 
