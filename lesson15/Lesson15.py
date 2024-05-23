@@ -48,14 +48,14 @@ def create_table_authors():  # Функция создлания таблицы 
     # Сначала удаляем таблицу (если она есть)
 
     cursor.execute(
-        "DROP TABLE IF EXISTS authors")  # чистов  рамках дз чтобы при перезапуке не дублирвоать данные в таблице
+        "DROP TABLE IF EXISTS authors CASCADE")  # чистов  рамках дз чтобы при перезапуке не дублирвоать данные в таблице
 
     create_table_query = """
 
                 CREATE TABLE IF NOT EXISTS authors (
                 id SERIAL PRIMARY KEY, 
                 first_name Text NOT NULL,
-                last_name Text,
+                last_name Text
                 );
 
                 """
@@ -67,7 +67,7 @@ def create_table_books():  # Функция создлания таблицы bo
     # Сначала удаляем таблицу (если она есть)
 
     cursor.execute(
-        "DROP TABLE IF EXISTS books")  # чистов  рамках дз чтобы при перезапуке не дублирвоать данные в таблице
+        "DROP TABLE IF EXISTS books CASCADE")  # чистов  рамках дз чтобы при перезапуке не дублирвоать данные в таблице
 
     create_table_query = """
 
@@ -75,7 +75,7 @@ def create_table_books():  # Функция создлания таблицы bo
                 id SERIAL PRIMARY KEY, 
                 title Text NOT NULL,
                 publication_year Integer,
-                author_id INTEGER REFERENCES authors (id),
+                author_id INTEGER REFERENCES authors (id)
                 );
 
                 """
@@ -94,7 +94,7 @@ def create_table_sales():  # Функция создлания таблицы sa
                 CREATE TABLE IF NOT EXISTS sales (
                 id SERIAL PRIMARY KEY, 
                 quantity Integer,
-                book_id INTEGER REFERENCES books (id),
+                book_id INTEGER REFERENCES books (id)
                 );
 
                 """
@@ -113,7 +113,7 @@ def add_authors():  # Функция для добавления данных в
 
     list_value = [('Алексанр', 'Пушкин'), ('Лев', 'Толстой'),
                   ('Сергей', 'Есенин'), ('Михаил', 'Булгаков'),
-                  'Серега']
+                  ('Серега','')]
 
     cursor.executemany(insert_query, list_value)
 
@@ -127,11 +127,11 @@ def add_book():  # Функция для добавления данных в SQ
 
     insert_query = """
 
-    INSERT INTO book (title, publication_year, author_id) VALUES (%s, %s, %s);
+    INSERT INTO books (title, publication_year, author_id) VALUES (%s, %s, %s);
 
     """
 
-    list_value = [('Граф Нулин', 1825, 1), ('Война и мир', 'Толстой', 2),
+    list_value = [('Граф Нулин', 1825, 1), ('Война и мир', 1915, 2),
                   ('Красный восток', 1925, 3), ('Мастер и маргарита', 1940, 4),
                   ('Собачье сердце', 1925, 4)]
 
@@ -162,9 +162,9 @@ def add_sales():  # Функция для добавления данных в S
 def innerjoin_author_and_book():  # Функция выполнения innerjoin по  author и book
     select_query = """
 
-        SELECT authors.first_name, authors.last_name, book.title 
+        SELECT authors.first_name, authors.last_name, books.title 
         FROM authors
-        JOIN book ON book.author_id = authors.id;
+        JOIN books ON books.author_id = authors.id;
 
         """
 
@@ -189,14 +189,14 @@ def left_or_right_join_author_and_book(path):  # Функция выполнен
     if path == 'right':
         select_query = """
             SELECT first_name, last_name, title
-            FROM authors RIGHT JOIN book 
+            FROM authors RIGHT JOIN books 
             ON authors.id = author_id;            
     
             """
     else:
         select_query = """
             SELECT first_name, last_name, title
-            FROM authors LEFT JOIN book 
+            FROM authors LEFT JOIN books 
             ON authors.id = author_id;
             
             """
@@ -219,10 +219,10 @@ def left_or_right_join_author_and_book(path):  # Функция выполнен
 def many_innerjoin_author_and_book_and_sales():  # Функция выполнения множественного innerjoin по  author и book
     select_query = """
 
-        SELECT authors.first_name, authors.last_name, book.title, sales.quantity
+        SELECT authors.first_name, authors.last_name, books.title, sales.quantity
         FROM authors
-        JOIN book ON book.author_id = authors.id;
-        JOIN sales ON sales.book_id = book.id;
+        JOIN books ON books.author_id = authors.id
+        JOIN sales ON sales.book_id = books.id;
 
         """
 
@@ -244,10 +244,10 @@ def many_left_join_author_and_book_and_sales():  # Функция выполне
 
     select_query = """
 
-        SELECT first_name, authors.last_name, book.title, sales.quantity
+        SELECT first_name, authors.last_name, books.title, sales.quantity
         FROM authors
-        LEFT JOIN book ON book.author_id = authors.id;
-        LEFT JOIN sales ON sales.book_id = book.id;
+        LEFT JOIN books ON books.author_id = authors.id
+        LEFT JOIN sales ON sales.book_id = books.id;
        
         """
     # Выполнение SQL-запроса для извлечения данных
@@ -269,11 +269,11 @@ def many_left_join_author_and_book_and_sales():  # Функция выполне
 def inner_join_with_agregation():  # Функция выполнения inner join с агрегатной функцией
     select_query = """
 
-        SELECT authors.first_name, authors.last_name, sum(sales.quantity) as sum_book
+        SELECT authors.first_name, authors.last_name, sum(sales.quantity)
         FROM authors
-        JOIN book ON book.author_id = authors.id;
-        JOIN sales ON sales.book_id = book.id;
-
+        JOIN books ON books.author_id = authors.id
+        JOIN sales ON sales.book_id = books.id
+        GROUP BY authors.first_name, authors.last_name;
         """
 
     # Выполнение SQL-запроса для извлечения данных
@@ -294,11 +294,11 @@ def left_join_with_agregation():  # Функция выполнения  left jo
 
     select_query = """
 
-        SELECT first_name, authors.last_name, sum(sales.quantity) as sum_book
+        SELECT authors.first_name, authors.last_name, sum(sales.quantity) as sum_book
         FROM authors
-        LEFT JOIN book ON book.author_id = authors.id;
-        LEFT JOIN sales ON sales.book_id = book.id;
-
+        LEFT JOIN books ON books.author_id = authors.id
+        LEFT JOIN sales ON sales.book_id = books.id
+        GROUP BY authors.first_name, authors.last_name;
         """
     # Выполнение SQL-запроса для извлечения данных
 
@@ -318,13 +318,13 @@ def left_join_with_agregation():  # Функция выполнения  left jo
 def find_max_sales_author():  # Функция поиска автора с максимльно продаваемой книгой
     select_query = """
 
-        SELECT authors.first_name, authors.last_name, sum(sales.quantity) as sum_book
+        SELECT authors.first_name, authors.last_name, sales.quantity 
         FROM authors
-        JOIN book ON book.author_id = authors.id;
-        JOIN sales ON sales.book_id = book.id;
-        FROM sales
-        WHERE sales.quantity = MAX(sales.quantity)
-
+        JOIN books ON books.author_id = authors.id
+        JOIN sales ON sales.book_id = books.id
+        GROUP BY authors.first_name, authors.last_name, sales.quantity 
+        HAVING sales.quantity = MAX(sales.quantity);
+        
         """
 
     # Выполнение SQL-запроса для извлечения данных
@@ -344,12 +344,13 @@ def find_max_sales_author():  # Функция поиска автора с ма
 def find_book_higher_avg():  # Функция поиска книги продажи которой выше среднего
     select_query = """
 
-        SELECT book.title, avg(sales.quantity) as avg_book
-        FROM book
-        JOIN sales ON sales.book_id = book.id;
-        FROM sales
-        WHERE sales.quantity > avg_book
-
+        SELECT books.title, sales.quantity
+        FROM authors
+        JOIN books ON books.author_id = authors.id
+        JOIN sales ON sales.book_id = books.id
+        GROUP BY books.title, sales.quantity
+        HAVING sales.quantity > avg(sales.quantity);
+        
         """
 
     # Выполнение SQL-запроса для извлечения данных
@@ -384,6 +385,7 @@ left_or_right_join_author_and_book('left')
 many_innerjoin_author_and_book_and_sales()
 many_left_join_author_and_book_and_sales()
 inner_join_with_agregation()
+left_join_with_agregation()
 find_max_sales_author()
 find_book_higher_avg()
 
