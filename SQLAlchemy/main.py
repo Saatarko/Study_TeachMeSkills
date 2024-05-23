@@ -43,8 +43,8 @@ SyncORM.insert_tables_services(5, 'Рентген', 90)
 SyncORM.insert_tables_services(6, 'Предварительный осмотр', 45)
 SyncORM.insert_tables_services(6, 'УЗИ', 47)
 
-SyncORM.avg_services_cost()
-SyncORM.avg_services_cost_left_join()
+SyncORM.sum_services_cost()
+SyncORM.sum_services_cost_left_join()
 
 
 

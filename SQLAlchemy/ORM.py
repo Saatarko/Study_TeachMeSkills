@@ -113,7 +113,7 @@ class SyncORM:
             print(result)
 
     @staticmethod
-    def avg_services_cost():  # функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
+    def sum_services_cost():  # функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
         """функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги """
 
         with session_factory() as session:
@@ -121,31 +121,33 @@ class SyncORM:
             p = aliased(PetsORM)
             s = aliased(PetsServicesORM)
 
-            subq = (
+            query = (
                 select(
-                    c.client_name,        # выбираем нужные столбцы
+                    c.client_name,  # выбираем нужные столбцы
                     p.pets_name,
                     p.pets_breed,
                     p.pets_age,
-                    func.avg(s.services_cost).cast(int).label('avg_services_cost')  # плюс нужная функция
+                    cast(func.sum(s.services_cost), Integer).label('sum_services_cost')  # плюс нужная функция
                 )
+
                 .join(c, c.id == p.client_id)  # делаем множественный join по id
                 .join(p, p.id == s.pets_id)
+                # .order_by(cast(func.sum(s.services_cost), Integer))
             )
-            query = (
-                select(subq)
-
-                # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
-                # элемент класса а таблица
-                .order_by(subq.c.avg_services_cost.asc())
-            )
+            # query = (
+            #     select(subq)
+            #
+            #     # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
+            #     # элемент класса а таблица
+            #     .order_by(subq.c.avg_services_cost.asc())
+            # )
             print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
             print(result)
 
     @staticmethod
-    def avg_services_cost_left_join():  # функцияleft_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
+    def sum_services_cost_left_join():  # функцияleft_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
         """функция left_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги (тупо по дз"""
 
         with session_factory() as session:
@@ -153,24 +155,25 @@ class SyncORM:
             p = aliased(PetsORM)
             s = aliased(PetsServicesORM)
 
-            subq = (
+            query = (
                 select(
                     c.client_name,  # выбираем нужные столбцы
                     p.pets_name,
                     p.pets_breed,
                     p.pets_age,
-                    func.avg(s.services_cost).cast(int).label('avg_services_cost')  # плюс нужная функция
+                    cast(func.sum(s.services_cost), Integer).label('sum_services_cost')  # плюс нужная функция
                 )
-                .join(c, c.id == p.client_id,isouter=True)  # делаем множественный left join(isouter=True) по id
-                .join(p, p.id == s.pets_id,isouter=True)
+                .join(c, c.id == p.client_id, isouter=True)  # делаем множественный left join(isouter=True) по id
+                .join(p, p.id == s.pets_id, isouter=True)
+                .order_by(cast(func.sum(s.services_cost), Integer).asc())
             )
-            query = (
-                select(subq)
-
-                # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
-                # элемент класса а таблица
-                .order_by(subq.c.avg_services_cost.asc())
-            )
+            # query = (
+            #     select(subq)
+            #
+            #     # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
+            #     # элемент класса а таблица
+            #     .order_by(subq.c.avg_services_cost.asc())
+            # )
             print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
