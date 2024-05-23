@@ -1,7 +1,8 @@
 from sqlalchemy import Integer, and_, cast, func, insert, inspect, or_, select, text
+from sqlalchemy.orm import aliased
 
 from database import Base, sync_engine, session_factory
-from models import ClientsORM, PetsORM
+from models import ClientsORM, PetsORM, PetsServicesORM, Servises
 
 
 class SyncORM:
@@ -34,6 +35,31 @@ class SyncORM:
             session.commit()
 
     @staticmethod
+    def insert_tables_services(temp_id, temp_name, temp_cost):  # функция доабвления данных в таблицу
+        """Функция выбора вставки услуг для питомцев. temp_id - id питомца, temp_name -название услуги,
+        temp_cost стоимость услуги"""
+
+        if temp_name == 'Чипирование':
+            temp_name = Servises.chipping
+        elif temp_name == 'Дегельминтизация':
+            temp_name = Servises.deworming
+        elif temp_name == 'УЗИ':
+            temp_name = Servises.ultrasound
+        elif temp_name == 'Рентген':
+            temp_name = Servises.x_ray
+        elif temp_name == 'Операции':
+            temp_name = Servises.operation
+        elif temp_name == 'Стерилизация':
+            temp_name = Servises.sterilization
+        else:
+            temp_name = Servises.preliminary_examination
+
+        with session_factory() as session:
+            service = PetsServicesORM(pets_id=temp_id, services_name=temp_name, services_cost=temp_cost)
+            session.add(service)
+            session.commit()
+
+    @staticmethod
     def select_client(temp_id):  # Функция выбора клиента из списка (можно выбрать одного, моэжно всех)
         """Функция выбора  клиента/клиентов. temp_id - цифра конкретный id, 0 - выбрать всех"""
         with session_factory() as session:
@@ -49,7 +75,6 @@ class SyncORM:
                 result = session.get(ClientsORM, temp_id)  # для вывода ожного достаточно использовать get
                 clients = result.client_name
             print(f'{clients}')
-
 
     @staticmethod
     def update_client(clients_id, new_name):  # обновляем данные в таблице клиентво
@@ -81,10 +106,72 @@ class SyncORM:
                 ))
                 .group_by(PetsORM.pets_breed)  # группируем по породе
             )
-            # длеаем так чтобы в консоль выводился так же как SQL запрос
+            # длеаем так чтобы в консоль (эхо) выводился текст так же как SQL запрос
             print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
             print(result)
 
+    @staticmethod
+    def avg_services_cost():  # функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
+        """функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги """
 
+        with session_factory() as session:
+            c = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+            p = aliased(PetsORM)
+            s = aliased(PetsServicesORM)
+
+            subq = (
+                select(
+                    c.client_name,        # выбираем нужные столбцы
+                    p.pets_name,
+                    p.pets_breed,
+                    p.pets_age,
+                    func.avg(s.services_cost).cast(int).label('avg_services_cost')  # плюс нужная функция
+                )
+                .join(c, c.id == p.client_id)  # делаем множественный join по id
+                .join(p, p.id == s.pets_id)
+            )
+            query = (
+                select(subq)
+
+                # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
+                # элемент класса а таблица
+                .order_by(subq.c.avg_services_cost.asc())
+            )
+            print(query.compile(compile_kwargs={'literal_binds': True}))
+            res = session.execute(query)
+            result = res.all()
+            print(result)
+
+    @staticmethod
+    def avg_services_cost_left_join():  # функцияleft_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
+        """функция left_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги (тупо по дз"""
+
+        with session_factory() as session:
+            c = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+            p = aliased(PetsORM)
+            s = aliased(PetsServicesORM)
+
+            subq = (
+                select(
+                    c.client_name,  # выбираем нужные столбцы
+                    p.pets_name,
+                    p.pets_breed,
+                    p.pets_age,
+                    func.avg(s.services_cost).cast(int).label('avg_services_cost')  # плюс нужная функция
+                )
+                .join(c, c.id == p.client_id,isouter=True)  # делаем множественный left join(isouter=True) по id
+                .join(p, p.id == s.pets_id,isouter=True)
+            )
+            query = (
+                select(subq)
+
+                # делаем сортировку по возрастанию буква с обязательная - обозначает слово столбец т.к subq не э.
+                # элемент класса а таблица
+                .order_by(subq.c.avg_services_cost.asc())
+            )
+            print(query.compile(compile_kwargs={'literal_binds': True}))
+            res = session.execute(query)
+            result = res.all()
+            print(f'{result}')
