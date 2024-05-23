@@ -45,10 +45,6 @@ SyncORM.insert_tables_services(6, 'УЗИ', 47)
 
 SyncORM.pets_and_clients()
 
-SyncORM.sum_services_cost()
-
-
-
 SyncORM.avg_pets_age('ме', 4)
 
 
