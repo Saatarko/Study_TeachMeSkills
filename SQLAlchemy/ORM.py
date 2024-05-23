@@ -128,7 +128,7 @@ class SyncORM:
                     p.pets_age,
                 )
                 .join(cl, cl.id == p.client_id)  # делаем множественный join по id
-
+                .order_by(cl.client_name)
             )
             print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
@@ -137,7 +137,7 @@ class SyncORM:
 
     @staticmethod
     def sum_services_cost():  # функцияleft_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги
-        """функция left_join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги (тупо по дз"""
+        """функция inner join для таблицы клиенты, питомцы, услуги. с указанием общей суммы за услуги (тупо по дз"""
 
         with session_factory() as session:
             cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
@@ -150,18 +150,30 @@ class SyncORM:
                     p.pets_name,
                     p.pets_breed,
                     p.pets_age,
-                    cast(func.sum(s.services_cost), Integer).label('sum_services_cost')  # плюс нужная функция
+
                 )
 
-                .join(cl, cl.id == p.client_id)  # делаем множественный join по id
+                .join(cl, cl.id == p.client_id).subquery('first_join')  # делаем множественный join по id
+            )
+            cte = (
+                select(
+                    subq.c.client_name,
+                    subq.c.pets_name,
+                    subq.c.pets_breed,
+                    subq.c.pets_age,
+                    cast(func.sum(s.services_cost), Integer).label('sum_services_cost')  # сумма
+                )
                 .join(p, p.id == s.pets_id)
+                .cte('second_join')
+            )
 
-            )
             query = (
-                select(subq)
-                .order_by(subq.c.client_name.asc())
+                select(cte)
+                .order_by(cte.c.first_join.client_name.asc())
             )
+
             print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
             print(result)
+

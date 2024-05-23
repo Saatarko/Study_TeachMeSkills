@@ -16,6 +16,7 @@ class ClientsORM(Base):  # деклараруем создание новой б
     id: Mapped[int] = mapped_column(primary_key=True)
     client_name: Mapped[str]
     client_phone: Mapped[Optional[int]]
+    pets: Mapped[list["PetsORM"]] = relationship()    # создаем модели relationship
 
 
 class PetsORM(Base):  # деклараруем создание новой базы питомцев
@@ -27,7 +28,7 @@ class PetsORM(Base):  # деклараруем создание новой ба�
     pets_breed: Mapped[Optional[str]]
     client_id: Mapped[int] = mapped_column(ForeignKey('clients.id',
                                                       ondelete='CASCADE'))
-
+    clients: Mapped["ClientsORM"] = relationship()
 
 class Servises(enum.Enum):
     chipping = 'Чипирование'
@@ -49,3 +50,4 @@ class PetsServicesORM(Base):  # деклараруем создание ново
                                                                     func.now())
     pets_id: Mapped[int] = mapped_column(ForeignKey('pets.id',
                                                     ondelete='CASCADE'))
+    pets: Mapped["PetsORM"] = relationship()
