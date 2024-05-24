@@ -1,8 +1,9 @@
 from sqlalchemy import Integer, and_, cast, func, insert, inspect, or_, select, text
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, joinedload, selectinload
 
 from database import Base, sync_engine, session_factory
 from models import ClientsORM, PetsORM, PetsServicesORM, Servises
+from schemas import ClientsRelDTO, PetsRelDTO, PetsServicesRelDTO
 
 
 class SyncORM:
@@ -106,8 +107,8 @@ class SyncORM:
                 ))
                 .group_by(PetsORM.pets_breed)  # группируем по породе
             )
-            # длеаем так чтобы в консоль (эхо) выводился текст так же как SQL запрос
-            print(query.compile(compile_kwargs={'literal_binds': True}))
+            # длеаем так если надор что бы в консоль (эхо) выводился текст так же как SQL запрос
+            # print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
             print(result)
@@ -130,8 +131,77 @@ class SyncORM:
                 .join(cl, cl.id == p.client_id)  # делаем множественный join по id
                 .order_by(cl.client_name)
             )
-            print(query.compile(compile_kwargs={'literal_binds': True}))
+            # длеаем так если надор что бы в консоль (эхо) выводился текст так же как SQL запрос
+            # print(query.compile(compile_kwargs={'literal_binds': True}))
             res = session.execute(query)
             result = res.all()
             print(result)
 
+    @staticmethod
+    def pets_and_clients_relation_joinedload():  # функция  для таблицы клиенты, питомцы
+        """функция """
+
+        with session_factory() as session:
+            cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+            p = aliased(PetsORM)
+            s = aliased(PetsServicesORM)
+            query =(
+                select(
+                    cl,
+                    p,
+                    s
+                    .options(joinedload(cl.pets,s.pets))   # joinedload подхходит для 1-to 1 или Many -to -1
+                )
+
+            )
+            res = session.execute(query)
+            result = res.unique().scalars().all()
+            print(result)
+            for a in range(len(result)):
+                print(result[a])
+
+    @staticmethod
+    def pets_and_clients_relation_selectin():  # функция  для таблицы клиенты, питомцы
+        """функция """
+
+        with session_factory() as session:
+            cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+            p = aliased(PetsORM)
+            s = aliased(PetsServicesORM)
+            query =(
+                select(
+                    cl,
+                    p,
+                    s
+                    .options(selectinload(cl.pets)).subqueryload(s.pets)   # selectinload подхходит для 1-to Many или Many -to -Many
+                )
+
+            )
+            res = session.execute(query)
+            result = res.unique().scalars().all()
+            print(result)
+            for a in range(len(result)):
+                print(result[a])
+
+    @staticmethod
+    def convet_clients_to_dto():
+        with session_factory() as session:
+            cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+            p = aliased(PetsORM)
+            s = aliased(PetsServicesORM)
+            query = (
+                select(
+                    cl,
+                    p,
+                    s
+                    .option(selectinload(cl.pets).selectinload(s.pets))  # если не сработает провреить отдельными селектинами
+                     # один из вариантов для загрузки не всех полей -испольущем  .load_only()
+                )
+            )
+            res = session.execute(query)
+            result_ORM = res.scalars().all()
+            print(f'{result_ORM}')
+            result_DTO = [ClientsRelDTO.model_validate(row, from_attributes=True) for row in result_ORM]
+            print(f'{result_DTO}')
+
+            return result_DTO
