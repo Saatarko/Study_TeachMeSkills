@@ -16,7 +16,7 @@ class ClientsORM(Base):  # деклараруем создание новой б
     id: Mapped[int] = mapped_column(primary_key=True)
     client_name: Mapped[str]
     client_phone: Mapped[Optional[int]]
-    pets: Mapped[list["PetsORM"]] = relationship(
+    pets: Mapped["PetsORM"] = relationship(
         back_populates='clients',
         # primaryjoin = "and_(ClientsORM.id == PetsORM.client_id, PetsORM.breed == 'метис')"   # нужно для доп условий
 
@@ -36,11 +36,11 @@ class PetsORM(Base):  # деклараруем создание новой ба�
     client_id: Mapped[int] = mapped_column(ForeignKey('clients.id',
                                                       ondelete='CASCADE'))
     clients: Mapped["ClientsORM"] = relationship(
-        back_populates='pets'    # указывает явную связь между моделями
+        back_populates='pets',    # указывает явную связь между моделями
     )
 
     servise: Mapped["PetsServicesORM"] = relationship(
-        back_populates='pets_s'
+        back_populates='pets_s',
     )
 
     repr_cols_num = 4  # для каждой таблицы отдельно
@@ -67,7 +67,7 @@ class PetsServicesORM(Base):  # деклараруем создание ново
     pets_id: Mapped[int] = mapped_column(ForeignKey('pets.id',
                                                     ondelete='CASCADE'))
     pets_s: Mapped["PetsORM"] = relationship(
-        back_populates='servise'
+        back_populates='servise',
 
     )
     repr_cols_num = 3  # для каждой таблицы отдельно

@@ -43,8 +43,9 @@ SyncORM.insert_tables_services(5, 'Рентген', 90)
 SyncORM.insert_tables_services(6, 'Предварительный осмотр', 45)
 SyncORM.insert_tables_services(6, 'УЗИ', 47)
 
-SyncORM.pets_and_clients()
+# SyncORM.pets_and_clients()
 
 SyncORM.avg_pets_age('ме', 4)
 
+SyncORM.pets_and_clients_relation_selectin()
 

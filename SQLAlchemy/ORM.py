@@ -3,7 +3,7 @@ from sqlalchemy.orm import aliased, joinedload, selectinload
 
 from database import Base, sync_engine, session_factory
 from models import ClientsORM, PetsORM, PetsServicesORM, Servises
-from schemas import ClientsRelDTO, PetsRelDTO, PetsServicesRelDTO
+# from schemas import ClientsRelDTO, PetsRelDTO, PetsServicesRelDTO
 
 
 class SyncORM:
@@ -145,12 +145,12 @@ class SyncORM:
             cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
             p = aliased(PetsORM)
             s = aliased(PetsServicesORM)
-            query =(
+            query = (
                 select(
                     cl,
                     p,
                     s
-                    .options(joinedload(cl.pets,s.pets))   # joinedload подхходит для 1-to 1 или Many -to -1
+                    .options(joinedload(cl.pets, s.pets))  # joinedload подхходит для 1-to 1 или Many -to -1
                 )
 
             )
@@ -168,40 +168,44 @@ class SyncORM:
             cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
             p = aliased(PetsORM)
             s = aliased(PetsServicesORM)
-            query =(
-                select(
-                    cl,
-                    p,
-                    s
-                    .options(selectinload(cl.pets)).subqueryload(s.pets)   # selectinload подхходит для 1-to Many или Many -to -Many
-                )
-
-            )
-            res = session.execute(query)
-            result = res.unique().scalars().all()
-            print(result)
-            for a in range(len(result)):
-                print(result[a])
-
-    @staticmethod
-    def convet_clients_to_dto():
-        with session_factory() as session:
-            cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
-            p = aliased(PetsORM)
-            s = aliased(PetsServicesORM)
             query = (
                 select(
                     cl,
                     p,
                     s
-                    .option(selectinload(cl.pets).selectinload(s.pets))  # если не сработает провреить отдельными селектинами
-                     # один из вариантов для загрузки не всех полей -испольущем  .load_only()
                 )
+                .options(selectinload(cl.pets))
+                # .options(selectinload(s.pets_s))
+                # selectinload подхходит для 1-to Many или Many -to -Many
+
             )
             res = session.execute(query)
-            result_ORM = res.scalars().all()
-            print(f'{result_ORM}')
-            result_DTO = [ClientsRelDTO.model_validate(row, from_attributes=True) for row in result_ORM]
-            print(f'{result_DTO}')
+            result = res.scalars().all()
+            print(result)
+            for a in range(len(result)):
+                print(result[a])
 
-            return result_DTO
+    # @staticmethod
+    # def convet_clients_to_dto():
+    #     with session_factory() as session:
+    #         cl = aliased(ClientsORM)  # делаем псевдонимы для таблиц чтобы не писать их полное название
+    #         p = aliased(PetsORM)
+    #         s = aliased(PetsServicesORM)
+    #         query = (
+    #             select(
+    #                 cl,
+    #                 p,
+    #                 s
+    #             )
+    #             .options(selectinload(cl.pets).selectinload(s.pets_s))
+    #                 # если не сработает провреить отдельными селектинами
+    #                 # один из вариантов для загрузки не всех полей -испольущем  .load_only()
+    #
+    #         )
+    #         res = session.execute(query)
+    #         result_orm = res.scalars().all()
+    #         print(f'{result_orm}')
+    #         result_dto = [ClientsRelDTO.model_validate(row, from_attributes=True) for row in result_orm]
+    #         print(f'{result_dto}')
+    #
+    #         return result_dto

@@ -14,16 +14,16 @@ session_factory = sessionmaker(sync_engine)   # Объявляем сессию
 
 
 class Base(DeclarativeBase):
-    pass
 
-    repr_cols_num  = 3            # для каждой таблицы отдельно
+    repr_cols_num = 3            # для каждой таблицы отдельно
     repr_cols = tuple()          # для каждой таблицы отдельно
+
     def __repr__(self):
         cols = []
         for idx, col in enumerate(self.__table__.columns.keys()):
             if col in self.repr_cols or idx < self.repr_cols_num:
                 cols.append(f'{col} = {getattr(self, col)}')
-                temp= ','.join(cols)
+                temp = ','.join(cols)
         return (f'<{self.__class__.__name__}{temp}>')
 
 
