@@ -5,7 +5,7 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, fun
     DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
-from ORM import Base
+from database import Base
 
 
 class Order(Base):
@@ -14,11 +14,14 @@ class Order(Base):
     id_order = Column(Integer, primary_key=True)
     date = Column(DateTime, server_default=func.now())
 
-    id_client_order = Column(Integer, ForeignKey('id_client'))
+    id_client_order = Column(Integer, ForeignKey('client.id_client'))
 
-    client_order = relationship('client', backref=backref('order'))
-    orderList = relationship('order_list', backref=backref('order_orderList'))
-    order_order_employees = relationship('employees', backref=backref('order_employees'))
+    client_order = relationship('Client', back_populates='order')
+
+    client_order_list = relationship('OrderList', back_populates='order_order_list')
+
+    client_order_employees = relationship('Employees', back_populates='order_employees')
+
 
 
 class Client(Base):
@@ -29,7 +32,7 @@ class Client(Base):
     client_address = Column(Text)
     client_phone = Column(Text)
 
-    order = relationship('order', backref=backref('client_order'))
+    order = relationship('Order', back_populates='client_order')
 
 
 class OrderList(Base):
@@ -37,10 +40,11 @@ class OrderList(Base):
 
     id_order_list = Column(Integer, primary_key=True)
     order = Column(Text)
-    prize = Column(Integer)
+    price = Column(Integer)
 
-    id_order_order_list = Column(Integer, ForeignKey('id_order'))
-    order_orderList = relationship('order', backref=backref('orderList'))
+    id_order_order_list = Column(Integer, ForeignKey('order.id_order'))
+
+    order_order_list = relationship('Order', back_populates='client_order_list')
 
 
 class Employees(Base):
@@ -51,13 +55,58 @@ class Employees(Base):
     employees_profession = Column(Text)
     salary = Column(Integer)
 
-    id_order_employees = Column(Integer, ForeignKey('id_order'))
-    order_employees = relationship('order', backref=backref('order_order_employees'))
+    id_order_employees = Column(Integer, ForeignKey('order.id_order'))
+
+    order_employees = relationship('Order', back_populates='client_order_employees')
 
 
+@dataclass
+class Products:
+    size: int = field(default=15)
+    cheese: int = field(default=0)
+    pepperoni: int = field(default=0)
+    mushrooms: int = field(default=0)
+    onions: int = field(default=0)
+    bacon: int = field(default=0)
 
 
+class Recipes(Base, Products):
+    __tablename__ = "recipe"
+
+    id_recipe = Column(Integer, primary_key=True)
+    name_recipe = Column(String(50), unique=True)
+    size = Column(Integer)
+    cheese = Column(Integer)
+    pepperoni = Column(Integer)
+    mushrooms = Column(Integer)
+    onions = Column(Integer)
+    bacon = Column(Integer)
+    price = Column(Integer)
 
 
+@dataclass
+class PizzaBuilder:  # создаем класс сборки пиццы
+    parts = []
 
 
+@dataclass
+class PizzaDirector:  # создание класса директора пиццы
+
+    _builder = None  # создание класса директора пиццы
+
+    @property  # передаем в директора класс создания пиццы(геттер)
+    def builder(self):
+        return self._builder
+
+    @builder.setter  # передаем в директора класс создания пиццы(сеттер)
+    def builder(self, builder: PizzaBuilder):
+        self._builder = builder
+
+    def make_pizza(self, size, cheese, pepperoni, mushrooms, onions, bacon):  # метод создания пиццы
+        self.builder.add_size(size)
+        self.builder.add_cheese(cheese)
+        self.builder.add_pepperoni(pepperoni)
+        self.builder.add_mushrooms(mushrooms)
+        self.builder.add_onions(onions)
+        self.builder.add_bacon(bacon)
+        self.builder.list_parts()

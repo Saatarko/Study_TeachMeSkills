@@ -14,5 +14,7 @@ sync_engine = create_engine(   # соаздает движек для подкл
 session_factory = sessionmaker(sync_engine)   # Объявляем сессию
 
 
+class Base(DeclarativeBase):
+    pass
 
 
