@@ -54,10 +54,29 @@ SyncORM.insert_tables_employees(12, 'Сергей Петров', "Пиццери
 SyncORM.insert_tables_employees(13, 'Сергей Петров', "Пиццерист", 9)
 SyncORM.insert_tables_employees(13, 'Анна Васильева', "Пиццерист", 11)
 
+SyncORM.insert_tables_order_list(1, '4 сезона')
+SyncORM.insert_tables_order_list(1, '5 Сыров')
+SyncORM.insert_tables_order_list(2, 'Ветчина и Грибы')
+SyncORM.insert_tables_order_list(3, 'Гавайская')
+SyncORM.insert_tables_order_list(4, 'Грибная с голубым сыром')
+SyncORM.insert_tables_order_list(5, 'Карбонара')
+SyncORM.insert_tables_order_list(6, 'Фермерская')
+SyncORM.insert_tables_order_list(7, 'Маргарита')
+SyncORM.insert_tables_order_list(8, 'Маргарита')
+SyncORM.insert_tables_order_list(9, 'Маргарита')
+SyncORM.insert_tables_order_list(10, 'Карбонара')
+SyncORM.insert_tables_order_list(11, 'Пепперони')
+SyncORM.insert_tables_order_list(12, 'Пепперони')
+SyncORM.insert_tables_order_list(13, 'Фермерская')
+SyncORM.insert_tables_order_list(1, 'Карбонара')
+SyncORM.insert_tables_order_list(5, 'Гавайская')
+
+
 # SyncORM.print_table_client(0)
 # SyncORM.print_table_order(0)
 # SyncORM.print_table_recipe()
 
 # SyncORM.select_tables_client_and_order()
 
-SyncORM.select_tables_client_order_order_list()
+# SyncORM.select_tables_client_order_order_list()
+SyncORM.select_tables_client_order_order_list_avg_price()

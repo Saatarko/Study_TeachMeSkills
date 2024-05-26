@@ -38,9 +38,17 @@ class SyncORM:
             session.commit()
 
     @staticmethod
-    def insert_tables_order_list(temp_id, temp_order, temp_price):
+    def insert_tables_order_list(temp_id, temp_order):
         """Функция добавления данных в заказ - temp_id - id заказа, temp_order - заказ, temp_price - цена"""
         with session_factory() as session:
+            query = select(Recipes)
+            result = session.execute(query)
+            recipes = result.scalars().all()
+            for i in recipes:
+                if i.name_recipe == temp_order:
+                    temp_price = i.price
+                    break
+
             order_list = OrderList(id_order_order_list=temp_id, order=temp_order, price=temp_price)
             session.add(order_list)
             session.commit()
@@ -111,6 +119,7 @@ class SyncORM:
             session.add(employees)
             session.commit()
 
+
     @staticmethod
     def select_tables_client_and_order():
         with session_factory() as session:
@@ -137,23 +146,35 @@ class SyncORM:
             query = (
                 select(
                     Client,
-                    Order
                 )
-                .options(selectinload(Client.order))
-                .options(selectinload(Order.client_order_list))
-
-                .order_by(Client.id_client)
-
+                .options(selectinload(Client.order,Order.client_order_list))
             )
             result = session.execute(query)  # экзекьютим/выполняем ее
             res = result.scalars().all()
-            price = 0
+
             for i in res:
+                price = 0
                 for j in i.order:
                     temp = ''.join(j.date.strftime("%Y-%m-%d %H:%M:%S.%f"))
-                    for k in j:
+                    for k in j.client_order_list:
                         temp_order_list = ''.join(k.order)
-                        price += k.price
+                        price = k.price
 
                         print(f'Клиент - {i.client_name} адрес -{i.client_address} телефон - {i.client_phone} '
-                              f'дата- {temp}, заказ {temp_order_list}')
+                              f'дата- {temp}, заказ {temp_order_list} сумма {price}')
+
+    @staticmethod
+    def select_tables_client_order_order_list_avg_price():
+        with session_factory() as session:
+            query = (
+                select(
+                    Client,
+                    func.avg(OrderList.price)
+                )
+                .options(selectinload(Client.order, Order.client_order_list))
+                .group_by(Client.id_client)
+            )
+            result = session.execute(query)  # экзекьютим/выполняем ее
+            res = result.scalars().all()
+            print(f'{res}')
+
