@@ -93,6 +93,6 @@ print(f'\n')
 
 SyncORM.delete_any_row_in_table_with_id('Client', 6)
 
-SyncORM.update_any_table_without_id('Client', 'client_name', 'Петюня')
+SyncORM.delete_any_row_in_table_without_id('Client', 'client_name', 'Петюня')
 
 print(f'\n')
