@@ -120,7 +120,6 @@ class SyncORM:
             session.add(employees)
             session.commit()
 
-
     @staticmethod
     def select_tables_client_and_order():
         """Функция выбора и вывода таблицы клиента и заказа"""
@@ -140,7 +139,7 @@ class SyncORM:
                 for j in i.order:
                     temp = ''.join(j.date.strftime("%Y-%m-%d.%f"))
                 print(f'Клиент - {i.client_name} адрес -{i.client_address} телефон - {i.client_phone} '
-                          f'заказ дата- {temp}')
+                      f'заказ дата- {temp}')
 
     @staticmethod
     def select_tables_client_order_order_list():
@@ -150,7 +149,7 @@ class SyncORM:
                 select(
                     Client,
                 )
-                .options(selectinload(Client.order,Order.client_order_list))
+                .options(selectinload(Client.order, Order.client_order_list))
             )
             result = session.execute(query)  # экзекьютим/выполняем ее
             res = result.scalars().all()
@@ -164,7 +163,7 @@ class SyncORM:
                         price += k.price
 
                 print(f'Клиент - {i.client_name} адрес -{i.client_address} телефон - {i.client_phone} '
-                              f'дата- {temp}, заказ {temp_order_list} сумма {price}')
+                      f'дата- {temp}, заказ {temp_order_list} сумма {price}')
 
     @staticmethod
     def select_tables_client_order_order_list_avg_price():
@@ -216,11 +215,11 @@ class SyncORM:
         with session_factory() as session:
             if temp_table == 'Client':
                 if temp_field == 'client_name':
-                    query = (select(Client,).filter(Client.client_name == old_value))
+                    query = (select(Client, ).filter(Client.client_name == old_value))
                 elif temp_field == 'client_address':
-                    query = (select(Client,).filter(Client.client_address == old_value))
+                    query = (select(Client, ).filter(Client.client_address == old_value))
                 elif temp_field == 'client_phone':
-                    query = (select(Client,).filter(Client.client_phone == old_value))
+                    query = (select(Client, ).filter(Client.client_phone == old_value))
 
             elif temp_table == 'OrderList':
                 query = (select(OrderList, ).filter(OrderList.order == old_value))
@@ -261,7 +260,6 @@ class SyncORM:
 
             session.commit()
 
-
     @staticmethod
     def search_client_by_city(temp_city):
         """Функция формирования списка клиентов по городу (Можно не целиком), temp_city - строка с названием"""
@@ -270,7 +268,7 @@ class SyncORM:
                 select(
                     Client,
                 )
-                .options(selectinload(Client.order,Order.client_order_list))
+                .options(selectinload(Client.order, Order.client_order_list))
                 .filter(Client.client_address.ilike(f'%{temp_city}%'))
                 .order_by(Client.client_name)
             )
@@ -282,12 +280,11 @@ class SyncORM:
                 for j in i.order:
                     temp = ''.join(j.date.strftime("%Y-%m-%d %H:%M:%S.%f"))
                     for k in j.client_order_list:
-
                         temp_order_list.append(k.order)
                         price += k.price
 
                 print(f'Клиент - {i.client_name} адрес -{i.client_address} телефон - {i.client_phone} '
-                              f'дата- {temp}, заказы {temp_order_list} на сумму {price}')
+                      f'дата- {temp}, заказы {temp_order_list} на сумму {price}')
 
     @staticmethod
     def delete_any_row_in_table_with_id(temp_table, temp_id):
@@ -305,7 +302,7 @@ class SyncORM:
     @staticmethod
     def delete_any_row_in_table_without_id(temp_table, temp_field, old_value):
         """Функция удаления данных в таблице без ID по любому полю, где temp_table - таблица для обновления
-        temp_field - поле для обновлениея, old_value -текущее значение, new_value - новое значение"""
+        temp_field - поле для обновлениея, old_value -текущее значение"""
         with session_factory() as session:
             if temp_table == 'Client':
                 if temp_field == 'client_name':

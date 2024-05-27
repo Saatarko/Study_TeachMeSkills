@@ -11,7 +11,7 @@ from database import Base
 class Order(Base):
     __tablename__ = "order"
 
-    id_order = Column(Integer, primary_key=True)
+    id_order = Column(Integer, primary_key=True, ondelete='CASCADE')
     date = Column(DateTime, server_default=func.current_date())
 
     id_client_order = Column(Integer, ForeignKey('client.id_client'))
@@ -23,11 +23,10 @@ class Order(Base):
     client_order_employees = relationship('Employees', back_populates='order_employees')
 
 
-
 class Client(Base):
     __tablename__ = "client"
 
-    id_client = Column(Integer, primary_key=True)
+    id_client = Column(Integer, primary_key=True, ondelete='CASCADE')
     client_name = Column(Text)
     client_address = Column(Text)
     client_phone = Column(Text)
@@ -38,7 +37,7 @@ class Client(Base):
 class OrderList(Base):
     __tablename__ = "order_list"
 
-    id_order_list = Column(Integer, primary_key=True)
+    id_order_list = Column(Integer, primary_key=True, ondelete='CASCADE')
     order = Column(Text)
     price = Column(Integer)
 
