@@ -12,7 +12,7 @@ class Order(Base):
     __tablename__ = "order"
 
     id_order = Column(Integer, primary_key=True)
-    date = Column(DateTime, server_default=func.now())
+    date = Column(DateTime, server_default=func.current_date())
 
     id_client_order = Column(Integer, ForeignKey('client.id_client'))
 

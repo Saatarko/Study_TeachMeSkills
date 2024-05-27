@@ -72,11 +72,27 @@ SyncORM.insert_tables_order_list(1, 'Карбонара')
 SyncORM.insert_tables_order_list(5, 'Гавайская')
 
 
-# SyncORM.print_table_client(0)
+SyncORM.print_table_client(0)
 # SyncORM.print_table_order(0)
 # SyncORM.print_table_recipe()
 
 # SyncORM.select_tables_client_and_order()
 
 # SyncORM.select_tables_client_order_order_list()
-SyncORM.select_tables_client_order_order_list_avg_price()
+# SyncORM.select_tables_client_order_order_list_avg_price()
+
+# SyncORM.update_any_table_with_id('Client', 'client_name', 'Валюха', 4)
+print(f'\n')
+
+# SyncORM.update_any_table_without_id('Client', 'client_name', 'Петюня', 'Валюха')
+#
+SyncORM.print_table_client(0)
+print(f'\n')
+
+# SyncORM.search_client_by_city('Мин')
+
+SyncORM.delete_any_row_in_table_with_id('Client', 6)
+
+SyncORM.update_any_table_without_id('Client', 'client_name', 'Петюня')
+
+print(f'\n')
