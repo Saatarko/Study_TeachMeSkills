@@ -1,10 +1,64 @@
 <!DOCTYPE html>
 <html lang="ru">
-{% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+<head>
 
-{% block content %}
-  <h1>Всем привет!</h1>
-  <p>Это базовая страница сайта.</p>
-{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <title>{{'Стартовая страница'}}</title>
+
+</head>
+<body>
+    <header>
+         <p class="text-center">Домашняя работа по теме FLask</p>
+    </header>
+
+
+
+    <h1 class="text-center">{{'Вас приветствует пиццерия "Kota tez pojebalo" '}}</h1>
+
+    <div class="all_pizza">
+         <div class="pizza">
+            <img src="{{ url_for('static', filename='/media/examples/4_sezona.png') }}" alt="Пицца 4 сезона" />
+             <p>href="{{ url_for('get_pizza_interface', name='4 сезона') }}">4 сезона</p>
+         </div>
+         <div class="pizza">
+             <img src="{{ url_for('static', filename='/media/examples/5_syrov-thumbnail-480x480.png') }}" alt="Пицца 5 сыров" />
+             <p>href="{{ url_for('pizza') }}">5 сыров</p>
+         </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/gavayskaya9_new-thumbnail-480x480.png') }}" alt="Пицца Гавайская" />
+            <p>href="{{ url_for('pizza') }}">Гавайская</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/carbonara.png') }}" alt="Пицца Карбонара" />
+            <p>href="{{ url_for('pizza') }}">Карбонара</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/fermerskaya.png') }}" alt="Пицца Фермерская" />
+             <p>href="{{ url_for('pizza') }}">Фермерская</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/Pepperony.png') }}" alt="Пицца Пеперони" />
+             <p>href="{{ url_for('pizza') }}">Пеперони</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/margarita.png') }}" alt="Пицца Маргарита" />
+             <p>href="{{ url_for('pizza') }}">Маргарита</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/vetchina_i_griby.png') }}" alt="Пицца Ветчина и Грибы" />
+             <p>href="{{ url_for('pizza') }}">Ветчина и Грибы</p>
+        </div>
+        <div class="pizza">
+            <img src="{{ url_for('static', filename='media/examples/gribnaya.png') }}" alt="Пицца Грибная с голубым сыром" />
+            <p>href="{{ url_for('pizza') }}">Грибная с голубым сыром</p>
+        </div>
+    </div>
+
+<FOOTER>
+        <P class="text-center">Published 2024-05-29></P>
+         <P class="text-center">Copyright © 2024 Saatarko</P>
+</FOOTER>
+</body>
+</html>

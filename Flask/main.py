@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
@@ -81,19 +83,20 @@ def index():
 
 
 @app.route('/<int:client_id>')
-def get_client(client_id):
-    with app.app_context():
-        result = db.session.get(Client, client_id)  # для вывода ожного достаточно использовать get
-        clients = result
-        return render_template('client.html', clients=clients)
+def get_client_interface(client_id):
+    client = SyncORM.get_client(client_id)
+    return render_template('client.html', client=client)
 
 
 @app.route('/clients')
-def get_clients():
-    query = db.select(Client)  # для выбора всех выбирае всю таблицу целиком
-    result = db.session.execute(query)  # экзекьютим/выполняем ее
-    clients = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
+def get_clients_interface():
+    clients = SyncORM.get_clients()
     return render_template('clients.html', clients=clients)
+
+@app.route('/pizza')
+def get_pizza_interface(name='5 сыров'):
+    pizza = SyncORM.get_pizza(name)
+    return render_template('pizza.html', pizza=pizza)
 
 
 if __name__ == '__main__':

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from flask import render_template
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 
 from database import sync_engine
 from models import Client, Employees, Order, OrderList, Recipes
@@ -17,15 +18,15 @@ class SyncORM:
         # db.drop_all()
         db.create_all()
 
-
     @staticmethod
     def insert_tables_client(temp_name, temp_address, temp_phone):
         """Функция выбора вставки таблицы клиента. temp_name - имя клиента, temp_address - адрес, temp_phone -тел """
-        with app.app_context():    # замена сессиям в связки Фласк+Алхимия
+        with app.app_context():  # замена сессиям в связки Фласк+Алхимия
             client = Client(client_name=temp_name, client_address=temp_address, client_phone=temp_phone)
             db.session.add(client)
             db.session.commit()
-#
+
+    #
     @staticmethod
     def insert_tables_order(temp_id):
         """Функция добавления данных в табл заказ - temp_id - id клиента, дата заказа ставится автоматом"""
@@ -72,20 +73,36 @@ class SyncORM:
             db.session.add(employees)
             db.session.commit()
 
-
     @staticmethod
     def get_client(client_id):
         with app.app_context():
-            if client_id == 0:
-                query = db.select(Client)  # для выбора всех выбирае всю таблицу целиком
-                result = db.session.execute(query)  # экзекьютим/выполняем ее
-                clients = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
+            result = db.session.get(Client, client_id)  # для вывода ожного достаточно использовать get
+            client = result
+            return client
 
-            else:
-                result = db.session.get(Client, client_id)  # для вывода ожного достаточно использовать get
-                clients = result.client_name
+    @staticmethod
+    def get_clients():
+        with app.app_context():
+            query = db.select(Client)  # для выбора всех выбирае всю таблицу целиком
+            result = db.session.execute(query)  # экзекьютим/выполняем ее
+            clients = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
+            return clients
 
-            return render_template('client.html', clients=clients)
+    @staticmethod
+    def get_pizza(name):
+        with app.app_context():
+            query = (
+                db.select(
+                    Client,
+                )
+                .db.options(selectinload(Client.order))
+                .db.order_by(Client.id_client)
+
+                )
+            result = db.session.execute(query) # экзекьютим/выполняем ее
+            res = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
+            return res
+
     #
     # @staticmethod
     # def print_table_client(temp_id):

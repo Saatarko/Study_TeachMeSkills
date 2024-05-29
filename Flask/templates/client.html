@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ clients.client_name }}</title>
+    <title>{{ client.client_name }}</title>
 </head>
 <body>
-    <h1>{{ clients.client_name }}</h1>
-    <p>{{ clients.content }}</p>
-    <p>{{ clients.client_address }}</p>
-    <p>{{ clients.client_phone }}</p>
+    <h1>{{ client.client_name }}</h1>
+    <p>{{ client.content }}</p>
+    <p>{{ client.client_address }}</p>
+    <p>{{ client.client_phone }}</p>
     <a href="{{ url_for('index') }}">Back to index</a>
 </body>
 </html>
