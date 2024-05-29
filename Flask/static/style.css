@@ -16,7 +16,7 @@ h1 {
 .all_pizza {
   display: grid;
   grid-template: repeat(4, 1fr) / repeat(4, 1fr);
-  gap: 8px;
+  gap: 20px;
 }
 
 .pizza {
@@ -38,4 +38,18 @@ h1 {
 
 .text-center {
     text-align: center;
+}
+
+.one_pizza {
+  display: flex;
+
+
+}
+
+.pizza_stat {
+ width: 45%;
+  border: 1px solid #333;
+  box-shadow: 8px 8px 5px #444;
+  padding: 8px 12px;
+  background-image: linear-gradient(180deg, #fff, #ddd 40%, #ccc);
 }

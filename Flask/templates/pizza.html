@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{'Пицца'}}</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="one_pizza">
+        <div class="pizza_stat">
+             <img src="{{ url_for('static', filename='/media/examples/4_sezona.png') }}" alt="Пицца 4 сезона" />
+        </div>
+        <div class="pizza_stat">
+            <h1>{{pizza.name_recipe}}</h1>
+            <p>{{ pizza.size }}</p>
+            <p>{{ pizza.cheese }}</p>
+            <p>{{ pizza.pepperoni }}</p>
+            <p>{{ pizza.mushrooms }}</p>
+            <p>{{ pizza.onions }}</p>
+            <p>{{ pizza.bacon }}</p>
+            <p>{{ pizza.price }}</p>
+            <p>{{ pizza.description }}</p>
+        </div>
+    </div>
 
 </body>
 </html>

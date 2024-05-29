@@ -1,7 +1,6 @@
-import datetime
+
 from dataclasses import dataclass, field
 
-from flask import render_template
 from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 
@@ -15,8 +14,9 @@ class SyncORM:
     @staticmethod
     def create_tables():  # создаем все таблицы наcледуемые от db
         """Функция удаления и создания всех таблиц"""
-        # db.drop_all()
-        db.create_all()
+        with app.app_context():
+            # db.drop_all()
+            db.create_all()
 
     @staticmethod
     def insert_tables_client(temp_name, temp_address, temp_phone):
@@ -53,12 +53,12 @@ class SyncORM:
 
     @staticmethod
     def insert_tables_recipes(temp_name_recipe, temp_size, temp_cheese, temp_pepperoni, temp_mushrooms, temp_onions,
-                              temp_bacon, temp_price):  # функция доабвления данных в таблицу
+                              temp_bacon, temp_price, temp_decription, temp_eng_name):  # функция доабвления данных в таблицу
         """Функция выбора вставки таблицы клиента. temp_name - имя клиента, temp_address - адрес, temp_phone -тел """
         with app.app_context():
             recipes = Recipes(name_recipe=temp_name_recipe, size=temp_size, cheese=temp_cheese,
                               pepperoni=temp_pepperoni, mushrooms=temp_mushrooms, onions=temp_onions,
-                              bacon=temp_bacon, price=temp_price)
+                              bacon=temp_bacon, price=temp_price, description=temp_decription, eng_name=temp_eng_name)
             db.session.add(recipes)
             db.session.commit()
 
@@ -91,17 +91,15 @@ class SyncORM:
     @staticmethod
     def get_pizza(name):
         with app.app_context():
-            query = (
-                db.select(
-                    Client,
-                )
-                .db.options(selectinload(Client.order))
-                .db.order_by(Client.id_client)
+            query = db.select(Recipes)
+            result = db.session.execute(query)
+            recipes = result.scalars().all()
+            for i in recipes:
+                if i.name_recipe == name:
+                    return i
 
-                )
-            result = db.session.execute(query) # экзекьютим/выполняем ее
-            res = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
-            return res
+
+
 
     #
     # @staticmethod

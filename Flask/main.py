@@ -7,11 +7,7 @@ from database import app, db
 from ORM import SyncORM
 from models import Client, Employees, Order, OrderList, Recipes
 
-
-@app.before_request
-def before_first_request():
-    SyncORM.create_tables()
-
+SyncORM.create_tables()
 
 # SyncORM.insert_tables_client('Антон', 'г.Минск, Черняховского 4-3', '32546545774')
 # SyncORM.insert_tables_client('Денис Евсеев', 'г.Минск, Рокоссовского 15-354', '6756757567')
@@ -21,7 +17,7 @@ def before_first_request():
 # SyncORM.insert_tables_client('Алина Рин', 'г.Минск, Машерова 124', '4578967947')
 # SyncORM.insert_tables_client('Дмитрий Бейл', 'г.Могилев, Б. Шевченко 111-6', '789213475885')
 # SyncORM.insert_tables_client('Игорь ГХК', 'г.Пинск, Черняховского 5-2', '4579625547655')
-
+#
 # SyncORM.insert_tables_order(1)
 # SyncORM.insert_tables_order(2)
 # SyncORM.insert_tables_order(3)
@@ -36,15 +32,15 @@ def before_first_request():
 # SyncORM.insert_tables_order(3)
 # SyncORM.insert_tables_order(4)
 #
-# SyncORM.insert_tables_recipes('4 сезона', 18, 4, 3, 6, 7, 3, 35)
-# SyncORM.insert_tables_recipes('5 Сыров', 14, 5, 7, 3, 4, 1, 43)
-# SyncORM.insert_tables_recipes('Ветчина и Грибы', 14, 3, 5, 6, 1, 6, 45)
-# SyncORM.insert_tables_recipes('Гавайская', 13, 8, 2, 6, 5, 3, 36)
-# SyncORM.insert_tables_recipes('Грибная с голубым сыром', 18, 6, 3, 5, 7, 1, 51)
-# SyncORM.insert_tables_recipes('Карбонара', 15, 12, 7, 1, 4, 5, 23)
-# SyncORM.insert_tables_recipes('Маргарита', 15, 2, 10, 6, 8, 9, 34)
-# SyncORM.insert_tables_recipes('Пепперони', 18, 4, 4, 2, 6, 6, 25)
-# SyncORM.insert_tables_recipes('Фермерская', 18, 1, 9, 9, 9, 9, 42)
+# SyncORM.insert_tables_recipes('4 сезона', 18, 4, 3, 6, 7, 3, 35, 'Самая вкусная пицца!!!!', '4_sezona')
+# SyncORM.insert_tables_recipes('5 Сыров', 14, 5, 7, 3, 4, 1, 43, 'Самая вкусная пицца!!!!', '5_syrov')
+# SyncORM.insert_tables_recipes('Ветчина и Грибы', 14, 3, 5, 6, 1, 6, 45, 'Самая вкусная пицца!!!!', 'vetchina_i_griby')
+# SyncORM.insert_tables_recipes('Гавайская', 13, 8, 2, 6, 5, 3, 36, 'Самая вкусная пицца!!!!', 'gavayskaya')
+# SyncORM.insert_tables_recipes('Грибная с голубым сыром', 18, 6, 3, 5, 7, 1, 51, 'Самая вкусная пицца!!!!', 'gribnaya')
+# SyncORM.insert_tables_recipes('Карбонара', 15, 12, 7, 1, 4, 5, 23, 'Самая вкусная пицца!!!!', 'carbonara')
+# SyncORM.insert_tables_recipes('Маргарита', 15, 2, 10, 6, 8, 9, 34, 'Самая вкусная пицца!!!!', 'margarita')
+# SyncORM.insert_tables_recipes('Пепперони', 18, 4, 4, 2, 6, 6, 25, 'Самая вкусная пицца!!!!', 'Pepperony')
+# SyncORM.insert_tables_recipes('Фермерская', 18, 1, 9, 9, 9, 9, 42, 'Самая вкусная пицца!!!!', 'fermerskaya')
 #
 # SyncORM.insert_tables_employees(1, 'Сергей Петров', "Пиццерист", 5)
 # SyncORM.insert_tables_employees(2, 'Сергей Петров', "Пиццерист", 7)
@@ -77,6 +73,8 @@ def before_first_request():
 # SyncORM.insert_tables_order_list(13, 'Фермерская')
 # SyncORM.insert_tables_order_list(1, 'Карбонара')
 # SyncORM.insert_tables_order_list(5, 'Гавайская')
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -93,9 +91,10 @@ def get_clients_interface():
     clients = SyncORM.get_clients()
     return render_template('clients.html', clients=clients)
 
-@app.route('/pizza')
-def get_pizza_interface(name='5 сыров'):
-    pizza = SyncORM.get_pizza(name)
+
+@app.route('/<path:pizza>')
+def get_pizza_interface(pizza):
+    pizza = SyncORM.get_pizza(pizza)
     return render_template('pizza.html', pizza=pizza)
 
 

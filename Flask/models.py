@@ -2,14 +2,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, MetaData, ForeignKey, func, Index, CheckConstraint, Text, DateTime
-from sqlalchemy.orm import relationship
 
 from database import db
 
 
 class Order(db.Model):
     id_order = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, server_default=func.current_date()) #   - убрал для тестов
+    date = db.Column(db.DateTime, server_default=func.current_date())
 
     id_client_order = db.Column(db.Integer, db.ForeignKey('client.id_client'))
 
@@ -18,11 +17,6 @@ class Order(db.Model):
     client_order_list = db.relationship('OrderList', back_populates='order_order_list')
 
     client_order_employees = db.relationship('Employees', back_populates='order_employees')
-
-    # def __init__(self, id_client_order, date):
-    #
-    #     self.id_client_order = id_client_order
-    #     self.date = date
 
 
 class Client(db.Model):
@@ -33,12 +27,6 @@ class Client(db.Model):
 
     order = db.relationship('Order', back_populates='client_order')
 
-    # def __init__(self, client_name, client_address, client_phone):
-    #     self.client_name = client_name
-    #     self.client_address = client_address
-    #     self.client_phone = client_phone
-
-
 
 class OrderList(db.Model):
     id_order_list = db.Column(db.Integer, primary_key=True)
@@ -47,12 +35,6 @@ class OrderList(db.Model):
 
     id_order_order_list = db.Column(db.Integer, db.ForeignKey('order.id_order'))
     order_order_list = db.relationship('Order', back_populates='client_order_list')
-
-    # def __init__(self, order, price, id_order_order_list):
-    #     self.order = order
-    #     self.price = price
-    #     self.id_order_order_list = id_order_order_list
-
 
 
 class Employees(db.Model):
@@ -63,12 +45,6 @@ class Employees(db.Model):
 
     id_order_employees = db.Column(Integer, db.ForeignKey('order.id_order'))
     order_employees = db.relationship('Order', back_populates='client_order_employees')
-
-    # def __init__(self, employees_fullname, employees_profession, salary, id_order_employees):
-    #     self.employees_fullname = employees_fullname
-    #     self.employees_profession = employees_profession
-    #     self.salary = salary
-    #     self.id_order_employees = id_order_employees
 
 
 @dataclass
@@ -81,7 +57,7 @@ class Products:
     bacon: int = field(default=0)
 
 
-class Recipes(db.Model, Products):
+class Recipes(db.Model):
     id_recipe = db.Column(db.Integer, primary_key=True)
     name_recipe = db.Column(db.String(50), unique=True)
     size = db.Column(db.Integer)
@@ -91,6 +67,8 @@ class Recipes(db.Model, Products):
     onions = db.Column(db.Integer)
     bacon = db.Column(db.Integer)
     price = db.Column(db.Integer)
+    description = db.Column(db.Text)
+    eng_name = db.Column(db.Text)
 
 
 @dataclass
