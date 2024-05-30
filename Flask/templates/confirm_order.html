@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{'Оформление заказа'}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <h1 class="basket">Оформление заказа</h1>
+     <div class="form">
+          <div>
+            <p class="basket"> Пожалуйста, заполните все поля для оформления заказа</p>
+            <button onclick="redirectToUrl5()" class="button_order">Заказать!</button>
+            <script>
+                 function redirectToUrl5() {
+                 window.location.href = "{{ url_for('end_order_interface',  end='end') }}";
+                 }
+            </script>
+          </div>
+          <div>
+                <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <p class="label">
+                    {{ form.usernameOrder.label }}<br>
+                </p>
+                <p class="label">
+                    {{ form.addressOrder.label }}<br>
+                </p>
+                <p class="label">
+                    {{ form.phoneOrder.label }}<br>
+                </p>
+          </div>
+          <div>
+            <p class="form_label">
+                    {{ form.usernameOrder(size=32) }}
+                </p>
+                <p class="form_label">
+                    {{ form.addressOrder(size=32) }}
+                </p>
+                <p class="form_label">
+                    {{ form.phoneOrder(size=32) }}
+                </p>
+          </div>
+
+     </div>
+    </form>
+</body>
+</html>

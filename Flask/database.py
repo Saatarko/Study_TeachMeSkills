@@ -4,7 +4,7 @@ import sqlite3
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-from config import settings
+from config import settings, Config
 
 # sync_engine = settings.database_url_psycopg
 
@@ -14,6 +14,7 @@ sync_engine = "sqlite:///my.db"  # заготовка для случая отс
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = sync_engine
+app.config.from_object(Config)
 # app.app_context().push()
 db = SQLAlchemy(app)
 

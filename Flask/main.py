@@ -3,11 +3,13 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
+from Flask.form import OrderForm
 from database import app, db
 from ORM import SyncORM
 from models import Client, Employees, Order, OrderList, Recipes
 
 SyncORM.create_tables()
+
 
 # SyncORM.insert_tables_client('Антон', 'г.Минск, Черняховского 4-3', '32546545774')
 # SyncORM.insert_tables_client('Денис Евсеев', 'г.Минск, Рокоссовского 15-354', '6756757567')
@@ -92,11 +94,46 @@ def get_clients_interface():
     return render_template('clients.html', clients=clients)
 
 
-@app.route('/<path:pizza>')
+@app.route('/pizza/<string:pizza>')
 def get_pizza_interface(pizza):
-    pizza = SyncORM.get_pizza(pizza)
-    return render_template('pizza.html', pizza=pizza)
+    if pizza != 'favicon.ico':
+        pizza = SyncORM.get_pizza(pizza)
+        temp = pizza.eng_name
+        path = '/media/examples/' + temp + '.png'
+        return render_template('pizza.html', pizza=pizza, temp_path=path)
+
+
+@app.route('/order/<string:order>')
+def get_order_interface(order):
+    if order != 'favicon.ico':
+        temp = []
+        temp, all_price = SyncORM.get_order(order)
+
+        return render_template('basket.html', basket=temp, all_price=all_price)
+
+
+@app.route('/basket')
+def get_basket_interface():
+    temp = []
+    temp, all_price = SyncORM.basket_order()
+    return render_template('basket.html', basket=temp, all_price=all_price)
+
+
+@app.route('/basket/drop', methods=['GET'])
+def drop_basket_order_interface():
+    SyncORM.drop_basket_order()
+    return render_template('index.html')
+
+
+@app.route('/basket/confirm', methods=['GET'])
+def confirm_order_interface():
+    form = OrderForm()
+    return render_template('confirm_order.html', form=form)
+
+@app.route('/confirm_order/end', methods=['GET'])
+def end_order_interface():
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

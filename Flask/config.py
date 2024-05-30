@@ -20,3 +20,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'rfr;tdsvtyzpft,fkb'

@@ -10,3 +10,4 @@ css-parser==1.0.10
 
 flask~=3.0.3
 typing~=3.7.4.3
+wtforms~=3.1.2

@@ -10,7 +10,12 @@
 </head>
 <body>
     <header>
-         <p class="text-center">Домашняя работа по теме FLask</p>
+        <div class="navigation">
+            <div><a href="/">Пиццы</a></div>
+            <div>
+                <a href="/basket">Корзина</a>
+             </div>
+        </div>
     </header>
 
 
@@ -40,7 +45,7 @@
         </div>
         <div class="pizza">
             <img src="{{ url_for('static', filename='media/examples/Pepperony.png') }}" alt="Пицца Пеперони" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Пеперони') }}">Пеперони</a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Пепперони') }}">Пепперони</a>
         </div>
         <div class="pizza">
             <img src="{{ url_for('static', filename='media/examples/margarita.png') }}" alt="Пицца Маргарита" />
@@ -57,7 +62,7 @@
     </div>
 
 <FOOTER>
-        <P class="text-center">Published 2024-05-29></P>
+        <P class="text-center">Домашняя работа по теме FLask: Published 2024-05-29</P>
          <P class="text-center">Copyright © 2024 Saatarko</P>
 </FOOTER>
 </body>

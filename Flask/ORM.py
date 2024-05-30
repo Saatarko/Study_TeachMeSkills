@@ -5,9 +5,12 @@ from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 
 from database import sync_engine
-from models import Client, Employees, Order, OrderList, Recipes
+from models import Client, Employees, Order, OrderList, Recipes, PizzaDirector, PizzaBuilder, Basket
 from database import db, app
 
+director = PizzaDirector()  # создаем объекта класса директор
+builder = PizzaBuilder()  # создаем объекта класса создания пиццы
+director.builder = builder  # вызываем метод билдер из класса директор
 
 class SyncORM:
 
@@ -98,6 +101,43 @@ class SyncORM:
                 if i.name_recipe == name:
                     return i
 
+    @staticmethod
+    def get_order(name):
+        with app.app_context():
+            query = db.select(Recipes)
+            result = db.session.execute(query)
+            recipes = result.scalars().all()
+            for i in recipes:
+                if i.name_recipe == name:
+                    # это функция для потенциального списывания продуктов со склада
+                    director.make_pizza_self(size=i.size,cheese=i.cheese, pepperoni=i.pepperoni, mushrooms=i.mushrooms,
+                                             onions=i.onions, bacon=i.bacon)
+                    # кладем заказ в корзину
+                    basket = Basket(order=i.name_recipe,price=i.price)
+                    db.session.add(basket)
+                    db.session.commit()
+                    basket, all_price = SyncORM.basket_order()
+                    return basket, all_price
+
+    @staticmethod
+    def basket_order():
+        with app.app_context():
+            all_price = 0
+            query = db.select(Basket)
+            result = db.session.execute(query)
+            basket = result.scalars().all()  # отображаем выбранных заказов
+            all_price = sum([i.price for i in basket])
+            return basket, all_price
+
+    @staticmethod
+    def drop_basket_order():
+        with app.app_context():
+            db.session.query(Basket).delete()
+            db.session.commit()
+
+    @staticmethod
+    def confirm_order():
+        pass
 
 
 

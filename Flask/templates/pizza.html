@@ -3,22 +3,47 @@
 <head>
     <title>{{'Пицца'}}</title>
      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <div class="navigation">
+            <div><a href="/">Пиццы</a></div>
+            <div>
+                <a href="/basket">Корзина</a>
+             </div>
+    </div>
 </head>
 <body>
     <div class="one_pizza">
         <div class="pizza_stat">
-             <img src="{{ url_for('static', filename='/media/examples/4_sezona.png') }}" alt="Пицца 4 сезона" />
+
+             <img src="{{ url_for('static', filename=temp_path) }}" alt="{{pizza.name_recipe}}" />
         </div>
         <div class="pizza_stat">
-            <h1>{{pizza.name_recipe}}</h1>
-            <p>{{ pizza.size }}</p>
-            <p>{{ pizza.cheese }}</p>
-            <p>{{ pizza.pepperoni }}</p>
-            <p>{{ pizza.mushrooms }}</p>
-            <p>{{ pizza.onions }}</p>
-            <p>{{ pizza.bacon }}</p>
-            <p>{{ pizza.price }}</p>
-            <p>{{ pizza.description }}</p>
+            <h1>Пицца -"{{pizza.name_recipe}}"</h1>
+            <p> Размер пиццы:{{ pizza.size }}</p>
+            <p>В составе пиццы: {{(pizza.cheese)*100}} грамм сыра, {{pizza.pepperoni*100}} грамм пеперони,
+            {{pizza.mushrooms*100}} грамм шампиньонов, {{pizza.onions*100}} грамм лука, {{pizza.bacon*100}} грамм бекона
+            </p>
+            <p class="description">{{ pizza.description }}</p>
+
+             <p class="price">Цена - {{pizza.price}}.00 белорусских рублей</p>
+            <div class="basket">
+                <div>
+                    <button onclick="redirectToUrl3()" class="button_pizza">Добавить в корзину заказа</button>
+                    <script>
+                         function redirectToUrl3() {
+                         window.location.href = "{{ url_for('get_order_interface',  order=pizza.name_recipe) }}";
+                         }
+                    </script>
+                </div>
+                <div>
+                    <button onclick="redirectToUrl4()" class="button_pizza">Назад к выбору пиццы</button>
+                    <script>
+                         function redirectToUrl4() {
+                         window.location.href = "{{ url_for('index') }}";
+                         }
+                    </script>
+                </div>
+            </div>
+            <p></p>
         </div>
     </div>
 

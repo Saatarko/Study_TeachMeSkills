@@ -46,6 +46,11 @@ class Employees(db.Model):
     id_order_employees = db.Column(Integer, db.ForeignKey('order.id_order'))
     order_employees = db.relationship('Order', back_populates='client_order_employees')
 
+class Basket(db.Model):
+    id_basket = db.Column(db.Integer, primary_key=True)
+    order = db.Column(db.Text)
+    price = db.Column(db.Integer)
+
 
 @dataclass
 class Products:
@@ -75,6 +80,38 @@ class Recipes(db.Model):
 class PizzaBuilder:  # создаем класс сборки пиццы
     parts = []
 
+    @property
+    def product(self):
+        self._product = Products()  # присваиваем полю класса элементы другого класса.
+        product = self._product  # присваиваем поле в переменную
+        return product
+
+    def add_size(self, part):  # метод изменения размера пиццы
+        self.product.size = part
+        self.parts.append(f'размер {part}')
+
+    def add_cheese(self, part):  # метод добавки сыра
+        self.product.cheese = part
+        self.parts.append(f'сыр {part}')
+
+    def add_pepperoni(self, part):  # метод добавки пеперони
+        self.product.pepperoni = part
+        self.parts.append(f'Пеперони {part}')
+
+    def add_mushrooms(self, part):  # метод добавки грибов
+        self.product.mushrooms = part
+        self.parts.append(f'Грибы {part}')
+
+    def add_onions(self, part):  # метод добавки лука
+        self.product.onions = part
+        self.parts.append(f'лук {part}')
+
+    def add_bacon(self, part):  # метод добавки бекона
+        self.product.bacon = part
+        self.parts.append(f'Бекон {part}')
+
+    def list_parts(self):  # метод описания состава пиццы
+        return self.parts
 
 @dataclass
 class PizzaDirector:  # создание класса директора пиццы
@@ -89,7 +126,7 @@ class PizzaDirector:  # создание класса директора пиц�
     def builder(self, builder: PizzaBuilder):
         self._builder = builder
 
-    def make_pizza(self, size, cheese, pepperoni, mushrooms, onions, bacon):  # метод создания пиццы
+    def make_pizza_self(self, size, cheese, pepperoni, mushrooms, onions, bacon):  # метод создания пиццы
         self.builder.add_size(size)
         self.builder.add_cheese(cheese)
         self.builder.add_pepperoni(pepperoni)
@@ -97,3 +134,9 @@ class PizzaDirector:  # создание класса директора пиц�
         self.builder.add_onions(onions)
         self.builder.add_bacon(bacon)
         self.builder.list_parts()
+
+
+
+
+
+

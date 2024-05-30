@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ 'Корзина' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <div class="navigation">
+            <div><a href="/">Пиццы</a></div>
+            <div>
+                <a href="/basket">Корзина</a>
+             </div>
+    </div>
+</head>
+<body>
+    <div class="basket">
+    <h1>{{'Ваш текущий заказ:'}}</h1>
+    <ul>
+        {% for i in basket %}
+            <li>Пицца "{{i.order}}" по цене {{i.price}}.00 руб.</li>
+        {% endfor %}
+    </ul>
+    </div>
+    <div class="basket">
+        <button onclick="redirectToUrl1()" class="button">Очистить корзину заказов</button>
+        <button onclick="redirectToUrl2()" class="button">Оформить заказ</button>
+        <button onclick="redirectToUrl3()" class="button">Назад к выбору пиццы</button>
+            <script>
+                 function redirectToUrl1() {
+                 window.location.href = "{{ url_for('drop_basket_order_interface',  drop='drop') }}";
+                 }
+            </script>
+            <script>
+                 function redirectToUrl2() {
+                 window.location.href = "{{ url_for('confirm_order_interface',  confirm='confirm') }}";
+                 }
+            </script>
+            <script>
+                 function redirectToUrl3() {
+                 window.location.href = "{{ url_for('index') }}";
+                 }
+            </script>
+    </div>
+    <div class="basket">
+        <p class="description">Общая сумма заказа {{all_price}}</p>
+    </div>
+</body>
+</html>
+
