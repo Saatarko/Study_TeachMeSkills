@@ -7,6 +7,16 @@
 
     <title>{{'Стартовая страница'}}</title>
 
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+    </div>
 </head>
 <body>
     <header>
@@ -14,6 +24,9 @@
             <div><a href="/">Пиццы</a></div>
             <div>
                 <a href="/basket">Корзина</a>
+             </div>
+            <div>
+                <a href="/login">Служебная</a>
              </div>
         </div>
     </header>

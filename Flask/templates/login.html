@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{'Оформление заказа'}}</title>
+    <title>{{'Служебная часть сайта'}}</title>
     <div class="navigation">
             <div><a href="/">Пиццы</a></div>
             <div>
@@ -21,30 +21,31 @@
      <div class="form">
           <div>
             <p class="basket"> Пожалуйста, заполните все поля для оформления заказа</p>
-              <p class="button_order">{{ form.put_order() }}</p>
+              <p class="button_order">{{ form.submit() }}</p>
 
           </div>
           <div>
                <p class="label">
-                    {{ form.usernameOrder.label }}<br>
+                    {{ form.username.label }}<br>
                 </p>
                 <p class="label">
-                    {{ form.addressOrder.label }}<br>
-                </p>
-                <p class="label">
-                    {{ form.phoneOrder.label }}<br>
+                    {{ form.password.label }}<br>
                 </p>
           </div>
           <div>
             <p class="form_label">
-                    {{ form.usernameOrder(size=32) }}
+                    {{ form.username(size=32) }}
+                    {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
                 </p>
                 <p class="form_label">
-                    {{ form.addressOrder(size=32) }}
+                    {{ form.password(size=32) }}
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
                 </p>
-                <p class="form_label">
-                    {{ form.phoneOrder(size=32) }}
-                </p>
+                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
           </div>
 
      </div>

@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, MetaData, ForeignKey, func, Index, CheckConstraint, Text, DateTime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from database import db
 
@@ -46,10 +47,23 @@ class Employees(db.Model):
     id_order_employees = db.Column(Integer, db.ForeignKey('order.id_order'))
     order_employees = db.relationship('Order', back_populates='client_order_employees')
 
+
 class Basket(db.Model):
     id_basket = db.Column(db.Integer, primary_key=True)
     order = db.Column(db.Text)
     price = db.Column(db.Integer)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 
 @dataclass
@@ -113,6 +127,7 @@ class PizzaBuilder:  # создаем класс сборки пиццы
     def list_parts(self):  # метод описания состава пиццы
         return self.parts
 
+
 @dataclass
 class PizzaDirector:  # создание класса директора пиццы
 
@@ -134,9 +149,3 @@ class PizzaDirector:  # создание класса директора пиц�
         self.builder.add_onions(onions)
         self.builder.add_bacon(bacon)
         self.builder.list_parts()
-
-
-
-
-
-

@@ -1,3 +1,4 @@
+from flask_bootstrap import Bootstrap
 from sqlalchemy import String, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 import sqlite3
@@ -17,5 +18,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = sync_engine
 app.config.from_object(Config)
 # app.app_context().push()
 db = SQLAlchemy(app)
+bootstrap = Bootstrap(app)
 
 

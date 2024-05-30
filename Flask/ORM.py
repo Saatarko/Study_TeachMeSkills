@@ -3,9 +3,10 @@ from dataclasses import dataclass, field
 
 from sqlalchemy import func
 from sqlalchemy.orm import selectinload
+from wtforms.validators import ValidationError
 
 from database import sync_engine
-from models import Client, Employees, Order, OrderList, Recipes, PizzaDirector, PizzaBuilder, Basket
+from models import Client, Employees, Order, OrderList, Recipes, PizzaDirector, PizzaBuilder, Basket, User
 from database import db, app
 
 director = PizzaDirector()  # создаем объекта класса директор
@@ -136,12 +137,51 @@ class SyncORM:
             db.session.commit()
 
     @staticmethod
-    def confirm_order():
-        pass
+    def search_client_id(name):
+        with app.app_context():
+            query = db.select(Client)
+            result = db.session.execute(query)
+            client = result.scalars().all()
+            for i in client:
+                if i.client_name == name:
+                    return i.id_client
+
+    @staticmethod
+    def search_table_order(temp_id):
+        with app.app_context():
+            query = db.select(Order)
+            result = db.session.execute(query)
+            order = result.scalars().all()
+            for i in order:
+                if i.id_client_order == temp_id:
+                    return i.id_order
+
+    @staticmethod
+    def create_new_order(usernameorder, addressorder, phoneorder):
+        SyncORM.insert_tables_client(usernameorder, addressorder, phoneorder)
+        temp_id = SyncORM.search_client_id(usernameorder)
+        SyncORM.insert_tables_order(temp_id)
+        temp_id_order = SyncORM.search_table_order(temp_id)
+        with app.app_context():
+            query = db.select(Basket)
+            result = db.session.execute(query)
+            basket = result.scalars().all()
+            for i in basket:
+                SyncORM.insert_tables_order_list(temp_id_order, i.order)
+                db.session.commit()
+            SyncORM.drop_basket_order()
+
+
+    @staticmethod
+    def chek_value(username, password):
+
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
 
 
 
-    #
     # @staticmethod
     # def print_table_client(temp_id):
     #     with session_factory() as session:

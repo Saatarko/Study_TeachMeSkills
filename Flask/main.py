@@ -1,14 +1,11 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 
-from Flask.form import OrderForm
+from Flask.form import OrderForm, LoginForm
 from database import app, db
 from ORM import SyncORM
-from models import Client, Employees, Order, OrderList, Recipes
-
-SyncORM.create_tables()
 
 
 # SyncORM.insert_tables_client('Антон', 'г.Минск, Черняховского 4-3', '32546545774')
@@ -76,6 +73,8 @@ SyncORM.create_tables()
 # SyncORM.insert_tables_order_list(1, 'Карбонара')
 # SyncORM.insert_tables_order_list(5, 'Гавайская')
 
+SyncORM.create_tables()
+
 
 @app.route('/')
 def index():
@@ -125,15 +124,27 @@ def drop_basket_order_interface():
     return render_template('index.html')
 
 
-@app.route('/basket/confirm', methods=['GET'])
+@app.route('/basket/confirm', methods=['GET', 'POST'])
 def confirm_order_interface():
     form = OrderForm()
+    if form.validate_on_submit():
+        flash("Ваш заказ успешно принят! Ожидайте", "success")
+        SyncORM.create_new_order(form.usernameOrder.data, form.addressOrder.data, form.phoneOrder.data)
+        return render_template('index.html')
+
     return render_template('confirm_order.html', form=form)
 
-@app.route('/confirm_order/end', methods=['GET'])
-def end_order_interface():
-    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash("Ваш заказ успешно принят! Ожидайте", "success")
+        SyncORM.chek_value(form.username.data, form.password.data)
+        # Перенаправление на страницу входа или другую страницу
+        return redirect('/index')
+    return render_template('login.html', title='Войти', form=form)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
