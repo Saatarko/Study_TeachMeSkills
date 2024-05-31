@@ -119,7 +119,7 @@ def confirm_order_interface():
     if form.validate_on_submit():
         flash("Ваш заказ успешно принят! Ожидайте", "success")
         SyncORM.create_new_order(form.usernameOrder.data, form.addressOrder.data, form.phoneOrder.data)
-        redirect(url_for('index'))
+        return redirect(url_for('index'))
 
     return render_template('confirm_order.html', form=form)
 
