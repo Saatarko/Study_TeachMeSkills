@@ -1,22 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ client.client_name }}</title>
+    <title>{{'Клиенты'}}</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <div class="navigation">
             <div><a href="/">Пиццы</a></div>
             <div>
                 <a href="/basket">Корзина</a>
              </div>
             <div>
-                <a href="/login">Служебная</a>
+                 {% if current_user.is_anonymous %}
+                     <a href="{{ url_for('login') }}">Служебный вход</a>
+                 {% else %}
+                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
+                 {% endif %}
+             </div>
+            <div>
+                 {% if current_user.is_anonymous %}
+                     <p></p>
+                 {% else %}
+                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
+                 {% endif %}
              </div>
     </div>
 </head>
 <body>
-    <h1>{{ client.client_name }}</h1>
-    <p>{{ client.content }}</p>
-    <p>{{ client.client_address }}</p>
-    <p>{{ client.client_phone }}</p>
-    <a href="{{ url_for('index') }}">Back to index</a>
+    <h1 class="basket">Клиент -{{ client[0].client_name }}</h1>
+    <p class="basket">Доставка по адресу{{ client[0].client_address }}</p>
+    <p class="basket">Телефон для связи {{ client[0].client_phone }}</p>
+    <ul class="client_list" >
+    {% set ns = namespace(total_price=0) %}
+    {% for i in client %}
+        {% for j in i.order %}
+            <p> Заказ от {{j.date}}</p>
+            {% for k in j.client_order_list %}
+                <p class ="client_order_margin"> {{k.order}} на сумму {{k.price}}.00 рублей </p>
+                {% set ns.total_price = ns.total_price + k.price %}
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+
+   <p class ="description">Общая сумма: {{ns.total_price}}.00 рублей</p>
+    </ul>
+    <a href="{{ url_for('index') }}" class="button_client_exit">Вернуться на главную страницу</a>
 </body>
 </html>

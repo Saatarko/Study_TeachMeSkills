@@ -4,8 +4,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, MetaData, ForeignKey, func, Index, CheckConstraint, Text, DateTime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database import db
-
+from database import db, login
+from flask_login import UserMixin
 
 class Order(db.Model):
     id_order = db.Column(db.Integer, primary_key=True)
@@ -54,7 +54,7 @@ class Basket(db.Model):
     price = db.Column(db.Integer)
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
@@ -65,6 +65,10 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+@login.user_loader   # Функция загрузки пользователя
+def load_user(id):
+    return User.query.get(int(id))
 
 @dataclass
 class Products:

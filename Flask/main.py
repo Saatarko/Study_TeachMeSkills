@@ -1,11 +1,14 @@
 import os
 
-from flask import Flask, render_template, flash, redirect
+from flask import Flask, render_template, flash, redirect, url_for
+from flask_login import current_user, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 
 from Flask.form import OrderForm, LoginForm
 from database import app, db
 from ORM import SyncORM
+
+SyncORM.create_tables()
 
 
 # SyncORM.insert_tables_client('Антон', 'г.Минск, Черняховского 4-3', '32546545774')
@@ -73,24 +76,10 @@ from ORM import SyncORM
 # SyncORM.insert_tables_order_list(1, 'Карбонара')
 # SyncORM.insert_tables_order_list(5, 'Гавайская')
 
-SyncORM.create_tables()
-
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-@app.route('/<int:client_id>')
-def get_client_interface(client_id):
-    client = SyncORM.get_client(client_id)
-    return render_template('client.html', client=client)
-
-
-@app.route('/clients')
-def get_clients_interface():
-    clients = SyncORM.get_clients()
-    return render_template('clients.html', clients=clients)
 
 
 @app.route('/pizza/<string:pizza>')
@@ -130,21 +119,47 @@ def confirm_order_interface():
     if form.validate_on_submit():
         flash("Ваш заказ успешно принят! Ожидайте", "success")
         SyncORM.create_new_order(form.usernameOrder.data, form.addressOrder.data, form.phoneOrder.data)
-        return render_template('index.html')
+        redirect(url_for('index'))
 
     return render_template('confirm_order.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        flash("Ваш заказ успешно принят! Ожидайте", "success")
-        SyncORM.chek_value(form.username.data, form.password.data)
-        # Перенаправление на страницу входа или другую страницу
-        return redirect('/index')
+        if SyncORM.chek_value(form.username.data, form.password.data) is True:
+            flash(f"Добрый день {form.username.data}", "success")
+            # Перенаправление на страницу входа или другую страницу
+            temp_user = SyncORM.search_user(form.username.data)
+            login_user(temp_user, remember=form.remember_me.data)
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('login'))
     return render_template('login.html', title='Войти', form=form)
 
 
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/<int:client_id>')
+@login_required
+def get_client_interface(client_id):
+    client = SyncORM.select_tables_client_order_order_list(client_id)
+    return render_template('client.html', client=client)
+
+
+@app.route('/clients')
+@login_required
+def get_clients_interface():
+    clients = SyncORM.get_clients()
+    return render_template('clients.html', clients=clients)
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

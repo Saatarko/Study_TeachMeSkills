@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass, field
 
 from sqlalchemy import func
@@ -12,6 +11,7 @@ from database import db, app
 director = PizzaDirector()  # создаем объекта класса директор
 builder = PizzaBuilder()  # создаем объекта класса создания пиццы
 director.builder = builder  # вызываем метод билдер из класса директор
+
 
 class SyncORM:
 
@@ -57,7 +57,8 @@ class SyncORM:
 
     @staticmethod
     def insert_tables_recipes(temp_name_recipe, temp_size, temp_cheese, temp_pepperoni, temp_mushrooms, temp_onions,
-                              temp_bacon, temp_price, temp_decription, temp_eng_name):  # функция доабвления данных в таблицу
+                              temp_bacon, temp_price, temp_decription,
+                              temp_eng_name):  # функция доабвления данных в таблицу
         """Функция выбора вставки таблицы клиента. temp_name - имя клиента, temp_address - адрес, temp_phone -тел """
         with app.app_context():
             recipes = Recipes(name_recipe=temp_name_recipe, size=temp_size, cheese=temp_cheese,
@@ -111,10 +112,10 @@ class SyncORM:
             for i in recipes:
                 if i.name_recipe == name:
                     # это функция для потенциального списывания продуктов со склада
-                    director.make_pizza_self(size=i.size,cheese=i.cheese, pepperoni=i.pepperoni, mushrooms=i.mushrooms,
+                    director.make_pizza_self(size=i.size, cheese=i.cheese, pepperoni=i.pepperoni, mushrooms=i.mushrooms,
                                              onions=i.onions, bacon=i.bacon)
                     # кладем заказ в корзину
-                    basket = Basket(order=i.name_recipe,price=i.price)
+                    basket = Basket(order=i.name_recipe, price=i.price)
                     db.session.add(basket)
                     db.session.commit()
                     basket, all_price = SyncORM.basket_order()
@@ -171,87 +172,60 @@ class SyncORM:
                 db.session.commit()
             SyncORM.drop_basket_order()
 
-
     @staticmethod
     def chek_value(username, password):
+        query = db.select(User)
+        result = db.session.execute(query)
+        user = result.scalars().all()
+        for i in user:
+            if i.username == username:
+                return User.check_password(i, password)
 
-        user = User(username=username)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
+    @staticmethod
+    def insert_tables_user(temp_name, temp_pass):
+        """Функция выбора вставки таблицы клиента. temp_name - имя клиента, temp_address - адрес, temp_phone -тел """
+        with app.app_context():
+            check = False
+            query = db.select(User)
+            result = db.session.execute(query)
+            user = result.scalars().all()
+            for i in user:
+                if i.username == temp_name:
+                    check = True
+                    break
+            if check is False:
+                u = User(username=temp_name)
+                u.set_password(temp_pass)
+                db.session.add(u)
+                db.session.commit()
+
+    @staticmethod
+    def search_user(username):
+        query = db.select(User)
+        result = db.session.execute(query)
+        user = result.scalars().all()
+        for i in user:
+            if i.username == username:
+                return i
+
+    @staticmethod
+    def select_tables_client_order_order_list(temp_id):
+        """Функция выбора и вывода  клиента, заказа и списка заказа id -это id клиента"""
+        query = (
+            db.select
+                (
+                Client,
+            )
+            .options(selectinload(Client.order, Order.client_order_list))
+            .filter(Client.id_client == temp_id)
+        )
+        result = db.session.execute(query)
+        res = result.scalars().all()
+
+        return res
 
 
 
-    # @staticmethod
-    # def print_table_client(temp_id):
-    #     with session_factory() as session:
-    #         if temp_id == 0:
-    #             query = select(Client)  # для выбора всех выбирае всю таблицу целиком
-    #             result = session.execute(query)  # экзекьютим/выполняем ее
-    #             clients = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
-    #
-    #             for i in range(len(clients)):
-    #                 print(f'Клиент {clients[i].client_name}, адрес={clients[i].client_address} , '
-    #                       f'тел={clients[i].client_phone}')
-    #
-    #         else:
-    #             result = session.get(Clients, temp_id)  # для вывода ожного достаточно использовать get
-    #             clients = result.client_name
-    #             print(f'{clients}')
-    #
-    # @staticmethod
-    # def print_table_order(temp_id):
-    #     with session_factory() as session:
-    #         if temp_id == 0:
-    #             query = select(Order)  # для выбора всех выбирае всю таблицу целиком
-    #             result = session.execute(query)  # экзекьютим/выполняем ее
-    #             order = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
-    #
-    #             for i in range(len(order)):
-    #                 print(f'Клиент-ID {order[i].id_client_order}, дата {order[i].date} ')
-    #
-    #         else:
-    #             result = session.get(Order, temp_id)  # для вывода ожного достаточно использовать get
-    #             print(f'Клиент-ID {result.id_client_order},  дата {result.date} ')
-    #
-
-    #
-    # @staticmethod
-    # def print_table_recipe():
-    #     """Функция вывода таблицы рецептов """
-    #     with session_factory() as session:
-    #         query = select(Recipes)
-    #         result = session.execute(query)  # экзекьютим/выполняем ее
-    #         recipes = result.scalars().all()  # отображаем выбранных клиентво (скаляр для отсеива ненужных скобок)
-    #
-    #         for i in range(len(recipes)):
-    #             print(f'Пицца - {recipes[i].name_recipe}, размер {recipes[i].size}, сыр {recipes[i].cheese},'
-    #                   f' пепперони {recipes[i].pepperoni}, грибы {recipes[i].mushrooms}, лук {recipes[i].onions},'
-    #                   f'бекон {recipes[i].bacon}, цена {recipes[i].price}')
-    #
-
-    #
-    # @staticmethod
-    # def select_tables_client_and_order():
-    #     """Функция выбора и вывода таблицы клиента и заказа"""
-    #     with session_factory() as session:
-    #         query = (
-    #             select(
-    #                 Client,
-    #             )
-    #             .options(selectinload(Client.order))
-    #             .order_by(Client.id_client)
-    #
-    #         )
-    #         result = session.execute(query)  # экзекьютим/выполняем ее
-    #         res = result.scalars().all()
-    #
-    #         for i in res:
-    #             for j in i.order:
-    #                 temp = ''.join(j.datec)
-    #             print(f'Клиент - {i.client_name} адрес -{i.client_address} телефон - {i.client_phone} '
-    #                   f'заказ дата- {temp}')
-    #
     # @staticmethod
     # def select_tables_client_order_order_list():
     #     """Функция выбора и вывода таблицы клиента, заказа и списка заказа"""

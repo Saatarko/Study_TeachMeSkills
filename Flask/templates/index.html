@@ -26,7 +26,18 @@
                 <a href="/basket">Корзина</a>
              </div>
             <div>
-                <a href="/login">Служебная</a>
+                 {% if current_user.is_anonymous %}
+                     <a href="{{ url_for('login') }}">Служебный вход</a>
+                 {% else %}
+                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
+                 {% endif %}
+             </div>
+            <div>
+                 {% if current_user.is_anonymous %}
+                     <p></p>
+                 {% else %}
+                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
+                 {% endif %}
              </div>
         </div>
     </header>
