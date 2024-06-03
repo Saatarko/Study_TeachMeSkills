@@ -11,7 +11,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from sqlalchemy.orm import joinedload
-from config import Config
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'rfr;tdsvtyzpft,fkb'
 
 basedir = os.path.abspath(os.path.dirname(__file__))         # получаем из ос раб. директорию для базы
 sync_engine = "sqlite:///" + os.path.join(basedir, 'instance', 'my.db')
@@ -42,6 +44,10 @@ class Order(db.Model):
 
     client_order_employees = db.relationship('Employees', back_populates='order_employees')
 
+class TestModel(db.Model):
+    __tablename__ = 'test_model'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
 
 class Client(db.Model):
     id_client = db.Column(db.Integer, primary_key=True)
