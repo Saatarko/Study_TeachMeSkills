@@ -1,37 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ 'Клиенты' }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
+{% extends "base.html" %}
+
+
+{% block no_bootstrap_content %}
+    <div class="flex_clients">
+         <h1>{{'Клиенты'}}</h1>
     </div>
-</head>
-<body>
-    <h1 class="basket">{{'Клиенты'}}</h1>
-    <ul class="client_list" >
-        {% for i in clients %}
-            <p><a href="{{ url_for('get_client_interface', client_id=i.id_client) }}">
-                {{ i.client_name }}, адрес {{ i.client_address }}, тел {{ i.client_phone }}</a></p>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('index') }}" class="button_client_exit">Вернуться на главную страницу</a>
-</body>
-</html>
+    <<ul class="flex_clients">
+    {% for i in clients %}
+        <li class="flex_clients-child"> <!-- Используйте <li> вместо <p> для элементов списка -->
+            <a href="{{ url_for('get_client_interface', client_id=i.id_client) }}">
+                {{ i.client_name }}, адрес {{ i.client_address }}, тел {{ i.client_phone }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+    <div class="flex_clients">
+    <a href="{{ url_for('index') }}">Вернуться на главную страницу</a>
+    </div>
+{% endblock %}

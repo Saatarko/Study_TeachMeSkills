@@ -1,93 +1,61 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <title>{{'Стартовая страница'}}</title>
-
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-    </div>
-</head>
-<body>
-    <header>
-        <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
-        </div>
-    </header>
+{% extends "base.html" %}
 
 
-
-    <h1 class="text-center">{{'Вас приветствует пиццерия "Kota tez pojebalo" '}}</h1>
-
-    <div class="all_pizza">
-         <div class="pizza">
+{% block no_bootstrap_content %}
+    <div class="flex-container_body">
+         <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface', pizza='4 сезона') }}">
             <img src="{{ url_for('static', filename='/media/examples/4_sezona.png') }}" alt="Пицца 4 сезона" />
-             <a href="{{ url_for('get_pizza_interface',  pizza='4 сезона') }}">4 сезона</a>
+            </a>
+             <a href="{{ url_for('get_pizza_interface', pizza='4 сезона') }}" class="text_main">Пицца "4 сезона"</a>
          </div>
-         <div class="pizza">
-             <img src="{{ url_for('static', filename='/media/examples/syrov.png') }}" alt="Пицца 5 сыров" />
-             <a href="{{ url_for('get_pizza_interface',  pizza='5 Сыров') }}">5 сыров</a>
-              </div>
-        <div class="pizza">
+         <div class="flex_body-child">
+             <a href="{{ url_for('get_pizza_interface',  pizza='5 Сыров') }}">
+            <img src="{{ url_for('static', filename='/media/examples/syrov.png') }}" alt="Пицца 5 сыров" />
+            </a>
+             <a href="{{ url_for('get_pizza_interface',  pizza='5 Сыров') }}" class="text_main">Пицца "5 сыров"</a>
+        </div>
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Гавайская') }}">
             <img src="{{ url_for('static', filename='media/examples/gavayskaya.png') }}" alt="Пицца Гавайская" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Гавайская') }}">Гавайская</a>
+            </a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Гавайская') }}" class="text_main">Пицца "Гавайская"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Карбонара') }}">
             <img src="{{ url_for('static', filename='media/examples/carbonara.png') }}" alt="Пицца Карбонара" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Карбонара') }}">Карбонара</a>
+            </a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Карбонара') }}" class="text_main">Пицца "Карбонара"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Фермерская') }}">
             <img src="{{ url_for('static', filename='media/examples/fermerskaya.png') }}" alt="Пицца Фермерская" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Фермерская') }}">Фермерская</a>
+            </a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Фермерская') }}" class="text_main">Пицца "Фермерская"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+             <a href="{{ url_for('get_pizza_interface',  pizza='Пепперони') }}">
             <img src="{{ url_for('static', filename='media/examples/Pepperony.png') }}" alt="Пицца Пеперони" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Пепперони') }}">Пепперони</a>
+            </a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Пепперони') }}" class="text_main">Пицца "Пепперони"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Маргарита') }}">
             <img src="{{ url_for('static', filename='media/examples/margarita.png') }}" alt="Пицца Маргарита" />
-             <a href="{{ url_for('get_pizza_interface',  pizza='Маргарита') }}">Маргарита</a>
+            </a>
+             <a href="{{ url_for('get_pizza_interface',  pizza='Маргарита') }}" class="text_main">Пицца "Маргарита"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Ветчина и Грибы') }}">
             <img src="{{ url_for('static', filename='media/examples/vetchina_i_griby.png') }}" alt="Пицца Ветчина и Грибы" />
-            <a href="{{ url_for('get_pizza_interface',  pizza='Ветчина и Грибы') }}">Ветчина и Грибы</a>
+            </a>
+            <a href="{{ url_for('get_pizza_interface',  pizza='Ветчина и Грибы') }}" class="text_main">Пицца "Ветчина и Грибы"</a>
         </div>
-        <div class="pizza">
+        <div class="flex_body-child">
+            <a href="{{ url_for('get_pizza_interface',  pizza='Грибная с голубым сыром') }}">
             <img src="{{ url_for('static', filename='media/examples/gribnaya.png') }}" alt="Пицца Грибная с голубым сыром" />
-             <a href="{{ url_for('get_pizza_interface',  pizza='Грибная с голубым сыром') }}">Грибная с голубым сыром</a>
+            </a>
+             <a href="{{ url_for('get_pizza_interface',  pizza='Грибная с голубым сыром') }}" class="text_main">Пицца "Грибная с голубым сыром"</a>
         </div>
     </div>
-
-<FOOTER>
-        <P class="text-center">Домашняя работа по теме FLask: Published 2024-05-29</P>
-         <P class="text-center">Copyright © 2024 Saatarko</P>
-</FOOTER>
-</body>
-</html>
+{% endblock %}

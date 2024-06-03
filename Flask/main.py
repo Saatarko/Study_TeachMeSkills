@@ -1,26 +1,32 @@
 import os
 from dataclasses import dataclass, field
 
+import requests
 from flask import Flask, render_template, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from sqlalchemy import func, Integer
+from sqlalchemy import func, Integer, desc
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
-from sqlalchemy.orm import selectinload, joinedload, contains_eager
-
+from sqlalchemy.orm import joinedload
 from config import Config
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.dirname(__file__))         # получаем из ос раб. директорию для базы
 sync_engine = "sqlite:///" + os.path.join(basedir, 'instance', 'my.db')
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = sync_engine
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-login = LoginManager(app)
+app = Flask(__name__)   # включаем Фласк
+app.config['SQLALCHEMY_DATABASE_URI'] = sync_engine   # указываем ему адрес базы
+app.config.from_object(Config)   # передаем в конфиг секретный ключ
+db = SQLAlchemy(app)   # подключаем SQLAlchemy
+login = LoginManager(app)  # подключаем фласк логины
+
+# строки разрешенных символов для проверки данных
+
+letters = 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя-'
+numbers = '1234567890+'
+spec_s = ' ,.'
 
 
 # region Таблицы
@@ -150,6 +156,7 @@ class SyncORM:
 
     @staticmethod
     def get_client(client_id):
+        """Функция получения клиента по client_id"""
         with app.app_context():
             result = db.session.get(Client, client_id)  # для вывода ожного достаточно использовать get
             client = result
@@ -157,6 +164,7 @@ class SyncORM:
 
     @staticmethod
     def get_clients():
+        """Функция выгрузки всех клиентов"""
         with app.app_context():
             query = db.select(Client)  # для выбора всех выбирае всю таблицу целиком
             result = db.session.execute(query)  # экзекьютим/выполняем ее
@@ -165,6 +173,7 @@ class SyncORM:
 
     @staticmethod
     def get_pizza(name):
+        """Функция выгрузки данных по пицце из рецептов по названию. name - название"""
         with app.app_context():
             query = db.select(Recipes)
             result = db.session.execute(query)
@@ -175,6 +184,7 @@ class SyncORM:
 
     @staticmethod
     def get_order(name):
+        """Функция получения заказа name название пиццы """
         with app.app_context():
             query = db.select(Recipes)
             result = db.session.execute(query)
@@ -193,6 +203,7 @@ class SyncORM:
 
     @staticmethod
     def basket_order():
+        """Функция помещения заказа в корзину """
         with app.app_context():
             all_price = 0
             query = db.select(Basket)
@@ -203,12 +214,14 @@ class SyncORM:
 
     @staticmethod
     def drop_basket_order():
+        """Функция очистки корзины """
         with app.app_context():
             db.session.query(Basket).delete()
             db.session.commit()
 
     @staticmethod
     def search_client_id(name):
+        """Функция поиска id клиента по имени. name- имя """
         with app.app_context():
             query = db.select(Client)
             result = db.session.execute(query)
@@ -219,17 +232,40 @@ class SyncORM:
 
     @staticmethod
     def search_table_order(temp_id):
+        """Функция поиска id заказа по id клиента. temp_id- id клиента """
         with app.app_context():
-            query = db.select(Order)
-            result = db.session.execute(query)
-            order = result.scalars().all()
-            for i in order:
-                if i.id_client_order == temp_id:
-                    return i.id_order
+            # делаем фильтр по совпадению id и сортируем по убыванию по дате, и еще по номеру
+            # (чтобы получить последний id заказа)
+            last_order = Order.query.filter_by(id_client_order=temp_id).order_by(desc(Order.date),
+                                                                                 desc(Order.id_order)).first()
+            return last_order.id_order
+
+    @staticmethod
+    def search_table_order_for_date(temp_id):
+        """Функция поиска  даты заказа по id клиента. temp_id- id клиента """
+        with app.app_context():
+            # делаем фильтр по совпадению id и сортируем по убыванию по дате, и еще по номеру
+            # (чтобы получить дату последнего заказа)
+            last_order = Order.query.filter_by(id_client_order=temp_id).order_by(desc(Order.date),
+                                                                                 desc(Order.id_order)).first()
+            return last_order.date
 
     @staticmethod
     def create_new_order(usernameorder, addressorder, phoneorder):
-        SyncORM.insert_tables_client(usernameorder, addressorder, phoneorder)
+        """Функция создания нового заказа usernameorder - имя заказчика, addressorder - адрес,  phoneorder - телефон"""
+        check = False
+        temp_order_list = []
+        query = db.select(Client)
+        result = db.session.execute(query)
+        client = result.scalars().all()
+        for i in client:
+            if i.client_name == usernameorder:
+                addressorder = i.client_address
+                phoneorder = i.client_phone
+                check = True
+                break
+        if check is False:
+            SyncORM.insert_tables_client(usernameorder, addressorder, phoneorder)
         temp_id = SyncORM.search_client_id(usernameorder)
         SyncORM.insert_tables_order(temp_id)
         temp_id_order = SyncORM.search_table_order(temp_id)
@@ -239,11 +275,17 @@ class SyncORM:
             basket = result.scalars().all()
             for i in basket:
                 SyncORM.insert_tables_order_list(temp_id_order, i.order)
+                temp_order_list.append(i.order)
                 db.session.commit()
             SyncORM.drop_basket_order()
+            temp_date = SyncORM.search_table_order_for_date(temp_id)
+            SyncORM.pull_to_telegramm(usernameorder, addressorder, phoneorder, temp_date,  temp_order_list)
+
+        return check
 
     @staticmethod
     def chek_value(username, password):
+        """Функция проверки логина и пароля. username -логин, password -пароль"""
         with app.app_context():
             query = db.select(User)
             result = db.session.execute(query)
@@ -272,6 +314,7 @@ class SyncORM:
 
     @staticmethod
     def search_user(username):
+        """Функция поиска пользователя в базе по логину. username - логин"""
         with app.app_context():
             query = db.select(User)
             result = db.session.execute(query)
@@ -294,8 +337,36 @@ class SyncORM:
 
             return res
 
+    @staticmethod
+    def pull_to_telegramm(temp_name, temp_address, temp_phone, temp_date,  temp_order_str):
+        """Функция передачи сформированного заказа в телеграмм канал. temp_name - имя заказчика, temp_address - адрес
+        заказчика, temp_phone -телефон заказчика, temp_date - дата заказа, temp_order_str - заказ"""
+        bot_token = '6574088819:AAGCI0fWRLqQx033FKAZ9qWvTzx16SEH-Z8'
+        # ID  Telegram канала в формате @channelname
+        channel_id = -4266542112
+        # Текст сообщения
+        message_text = (f'Размещен заказ: Заказчик {temp_name}, тел {temp_phone}, доставка по адресу {temp_address},'
+                        f' от {temp_date} на  {temp_order_str} ')
+
+        # URL для отправки сообщений через Telegram Bot API
+        send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+
+        # Параметры запроса
+        params = {
+            'chat_id': channel_id,
+            'text': message_text
+        }
+
+        response = requests.post(send_message_url, params=params)
+
+        if response.status_code == 200:
+            return 'Отправка прошла успешно'
+        else:
+            return 'Отправка прошла неуспешно'
+
 
 class LoginForm(FlaskForm):
+    """Класс для кнопок логин-пароль"""
     username = StringField('Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
@@ -303,6 +374,7 @@ class LoginForm(FlaskForm):
 
 
 class OrderForm(FlaskForm):
+    """Класс для кнопок для заказа"""
     # validators=[DataRequired() проверяет не пустой ли поле
     usernameOrder = StringField('Имя', validators=[DataRequired()])
     addressOrder = StringField('Адрес', validators=[DataRequired()])
@@ -312,6 +384,7 @@ class OrderForm(FlaskForm):
 
 @dataclass
 class Products:
+    """Класс продуктов. Пока не используется, но можно добавить авто списание продуктов на производство пиццы"""
     size: int = field(default=15)
     cheese: int = field(default=0)
     pepperoni: int = field(default=0)
@@ -321,6 +394,7 @@ class Products:
 
 
 class Recipes(db.Model):
+    """Класс-таблица рецептов пицуы"""
     id_recipe = db.Column(db.Integer, primary_key=True)
     name_recipe = db.Column(db.String(50), unique=True)
     size = db.Column(db.Integer)
@@ -396,7 +470,7 @@ class PizzaDirector:  # создание класса директора пиц�
 
 
 # end region
-
+# создаем таблицы
 SyncORM.create_tables()
 
 director = PizzaDirector()  # создаем объекта класса директор
@@ -409,12 +483,12 @@ def load_user(temp_id):
     return User.query.get(int(temp_id))
 
 
-@app.route('/')
+@app.route('/')  # Функция обработки стартовой страницы
 def index():
     return render_template('index.html')
 
 
-@app.route('/pizza/<string:pizza>')
+@app.route('/pizza/<string:pizza>')   # Функция обработки страницы конкретной пиццы
 def get_pizza_interface(pizza):
     if pizza != 'favicon.ico':
         pizza = SyncORM.get_pizza(pizza)
@@ -423,7 +497,7 @@ def get_pizza_interface(pizza):
         return render_template('pizza.html', pizza=pizza, temp_path=path)
 
 
-@app.route('/order/<string:order>')
+@app.route('/order/<string:order>')   # Функция добавления заказа в корзину
 def get_order_interface(order):
     if order != 'favicon.ico':
         temp = []
@@ -432,31 +506,70 @@ def get_order_interface(order):
         return render_template('basket.html', basket=temp, all_price=all_price)
 
 
-@app.route('/basket')
+@app.route('/basket')    # Функция обработки корзины
 def get_basket_interface():
     temp = []
     temp, all_price = SyncORM.basket_order()
     return render_template('basket.html', basket=temp, all_price=all_price)
 
 
-@app.route('/basket/drop', methods=['GET'])
+@app.route('/basket/drop', methods=['GET'])     # Функция очистки корзины
 def drop_basket_order_interface():
     SyncORM.drop_basket_order()
     return render_template('index.html')
 
 
-@app.route('/basket/confirm', methods=['GET', 'POST'])
+@app.route('/basket/confirm', methods=['GET', 'POST'])    # Функция обработки заказа
 def confirm_order_interface():
     form = OrderForm()
     if form.validate_on_submit():
+        if not isinstance(form.usernameOrder.data, str):  # Проверка на то что бы имя были строкой
+
+            flash('Имя и Фамилия из цифр -  что-то новое! Попробуйте ввести еще раз!', "warning")
+            return render_template('confirm_order.html', form=form)
+        temp_name = form.usernameOrder.data.lower()
+        temp_name = temp_name.split()
+        if len(temp_name) > 4:
+            flash('Как-то слишком много слов для ФИО', "warning")
+            return render_template('confirm_order.html', form=form)
+
+        for s in temp_name:
+            if len(s.strip(letters)) != 0:
+                flash('В Имени и Фамилии допустимы только буквы!', "warning")
+                return render_template('confirm_order.html', form=form)
+
+        temp_address = form.addressOrder.data.lower()
+
+        allowed_chars = letters + numbers + spec_s
+        if len(temp_address.strip(allowed_chars)) != 0:
+            flash('У вас в адресе некорректные символы!', "warning")
+            return render_template('confirm_order.html', form=form)
+
+        allowed_chars = letters + spec_s
+        if len(temp_address.strip(allowed_chars)) == 0:
+            flash('В адресе должны быть хоть какие-то цифры(например номер дома)', "warning")
+            return render_template('confirm_order.html', form=form)
+
+        temp_phone = form.phoneOrder.data.lower()
+        temp_phone = temp_phone.split()
+        if len(temp_phone) > 1:
+            flash('Откуда пробелы в номере телефона', "warning")
+            return render_template('confirm_order.html', form=form)
+
+        for s in temp_phone:
+            if len(s.strip(numbers)) != 0:
+                flash('У вас в номере телефона некорректные символы!', "warning")
+                return render_template('confirm_order.html', form=form)
+
         flash("Ваш заказ успешно принят! Ожидайте", "success")
-        SyncORM.create_new_order(form.usernameOrder.data, form.addressOrder.data, form.phoneOrder.data)
+        temp = SyncORM.create_new_order(form.usernameOrder.data, form.addressOrder.data, form.phoneOrder.data)
         return redirect(url_for('index'))
+    else:
 
-    return render_template('confirm_order.html', form=form)
+        return render_template('confirm_order.html', form=form)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])    # Функция обработки входа в админку
 def login():
     if current_user.is_authenticated:
         redirect(url_for('index'))
@@ -473,25 +586,25 @@ def login():
     return render_template('login.html', title='Войти', form=form)
 
 
-@app.route('/logout', methods=['GET'])
+@app.route('/logout', methods=['GET'])    # Функция выхода из админки
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 
-@app.route('/<int:client_id>')
+@app.route('/<int:client_id>')   # Функция обработки перехода на конкретного клиента
 @login_required
 def get_client_interface(client_id):
     client = SyncORM.select_tables_client_order_order_list(client_id)
     return render_template('client.html', client=client)
 
 
-@app.route('/clients')
+@app.route('/clients')   # Функция вывода всех клиентов
 @login_required
 def get_clients_interface():
     clients = SyncORM.get_clients()
     return render_template('clients.html', clients=clients)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    # запуск сайта
     app.run()

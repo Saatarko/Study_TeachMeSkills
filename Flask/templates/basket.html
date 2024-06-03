@@ -1,31 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ 'Корзина' }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
-    </div>
-</head>
-<body>
-    <div class="basket">
+{% extends "base.html" %}
+
+
+{% block no_bootstrap_content %}
+    <div class="flex_basket">
     <h1>{{'Ваш текущий заказ:'}}</h1>
     <ul>
         {% for i in basket %}
@@ -33,10 +10,11 @@
         {% endfor %}
     </ul>
     </div>
-    <div class="basket">
-        <button onclick="redirectToUrl1()" class="button">Очистить корзину заказов</button>
-        <button onclick="redirectToUrl2()" class="button">Оформить заказ</button>
-        <button onclick="redirectToUrl3()" class="button">Назад к выбору пиццы</button>
+    <div class="flex_basket">
+        <button onclick="redirectToUrl3()" class="button_pizza">Назад к выбору пиццы</button>
+        <button onclick="redirectToUrl2()" class="button_pizza">Оформить заказ</button>
+        <button onclick="redirectToUrl1()" class="button_pizza">Очистить корзину заказов</button>
+
             <script>
                  function redirectToUrl1() {
                  window.location.href = "{{ url_for('drop_basket_order_interface',  drop='drop') }}";
@@ -53,9 +31,8 @@
                  }
             </script>
     </div>
-    <div class="basket">
-        <p class="description">Общая сумма заказа {{all_price}}</p>
+    <div class="flex_basket">
+        <p>Общая сумма заказа {{all_price}}.00 руб</p>
     </div>
-</body>
-</html>
+{% endblock %}
 

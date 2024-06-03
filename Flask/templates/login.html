@@ -1,57 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{'Служебная часть сайта'}}</title>
-    <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
-    </div>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% extends "base.html" %}
 
-</head>
-<body>
+
+{% block no_bootstrap_content %}
+
      <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
-    <h1 class="basket">Служебный вход</h1>
-     <div class="form">
-          <div>
-            <p class="basket"> Пожалуйста, введите логин и пароль для входа</p>
-              <p class="button_order">{{ form.submit() }}</p>
+    <h1 class="text-login">Служебный вход</h1>
+     <div class="flex_login">
+         <div class="flex_basket-child">
+
+                <p> Пожалуйста, введите логин и пароль для входа</p>
+                  <p>{{ form.submit() }}</p>
 
           </div>
-          <div>
-               <p class="label">
+          <div class="flex_basket-child">
+               <p>
                     {{ form.username.label }}<br>
                 </p>
-                <p class="label">
+                <p>
                     {{ form.password.label }}<br>
                 </p>
           </div>
-          <div>
-            <p class="form_label">
+          <div class="flex_basket-child">
+            <p>
                     {{ form.username(size=32) }}
                     {% for error in form.username.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
 
                 </p>
-                <p class="form_label">
+                <p>
                     {{ form.password(size=32) }}
                     {% for error in form.password.errors %}
                     <span style="color: red;">[{{ error }}]</span>
@@ -59,9 +37,6 @@
                 </p>
                 <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
           </div>
-
      </div>
     </form>
-</body>
-</html>
-
+{% endblock %}

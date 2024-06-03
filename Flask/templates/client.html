@@ -1,34 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{'Клиенты'}}</title>
-     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
+{% extends "base.html" %}
+
+
+{% block no_bootstrap_content %}
+     <div class="flex_clients">
+    <h1>Клиент -{{ client[0].client_name }}</h1>
+     </div>
+    <div class="flex_clients">
+        <p>Доставка по адресу{{ client[0].client_address }}</p>
+        <p>Телефон для связи {{ client[0].client_phone }}</p>
     </div>
-</head>
-<body>
-    <h1 class="basket">Клиент -{{ client[0].client_name }}</h1>
-    <p class="basket">Доставка по адресу{{ client[0].client_address }}</p>
-    <p class="basket">Телефон для связи {{ client[0].client_phone }}</p>
-    <ul class="client_list" >
+    <ul class="flex_clients" >
     {% set ns = namespace(total_price=0) %}
     {% for i in client %}
         {% for j in i.order %}
@@ -40,8 +21,12 @@
         {% endfor %}
     {% endfor %}
 
-   <p class ="description">Общая сумма: {{ns.total_price}}.00 рублей</p>
+
     </ul>
-    <a href="{{ url_for('index') }}" class="button_client_exit">Вернуться на главную страницу</a>
-</body>
-</html>
+    <div class="flex_clients">
+        <p class ="description">Общая сумма: {{ns.total_price}}.00 рублей</p>
+     </div>
+     <div class="flex_clients">
+            <a href="{{ url_for('index') }}" >Вернуться на главную страницу</a>
+    </div>
+{% endblock %}

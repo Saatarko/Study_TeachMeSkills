@@ -1,36 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{'Пицца'}}</title>
-     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <div class="navigation">
-            <div><a href="/">Пиццы</a></div>
-            <div>
-                <a href="/basket">Корзина</a>
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <a href="{{ url_for('login') }}">Служебный вход</a>
-                 {% else %}
-                    <a href="{{ url_for('logout',  logout='logout') }}">Выйти</a>
-                 {% endif %}
-             </div>
-            <div>
-                 {% if current_user.is_anonymous %}
-                     <p></p>
-                 {% else %}
-                    <a href="{{ url_for('get_clients_interface') }}">Клиенты</a>
-                 {% endif %}
-             </div>
-    </div>
-</head>
-<body>
-    <div class="one_pizza">
-        <div class="pizza_stat">
+{% extends "base.html" %}
+
+{% block no_bootstrap_content %}
+    <div class="flex_body-pizza">
 
              <img src="{{ url_for('static', filename=temp_path) }}" alt="{{pizza.name_recipe}}" />
-        </div>
-        <div class="pizza_stat">
+
+    </div>
+    <div class="flex_body-pizza">
+         <div class="flex_body-pizza-child">
             <h1>Пицца -"{{pizza.name_recipe}}"</h1>
             <p> Размер пиццы:{{ pizza.size }}</p>
             <p>В составе пиццы: {{(pizza.cheese)*100}} грамм сыра, {{pizza.pepperoni*100}} грамм пеперони,
@@ -39,7 +16,9 @@
             <p class="description">{{ pizza.description }}</p>
 
              <p class="price">Цена - {{pizza.price}}.00 белорусских рублей</p>
-            <div class="basket">
+         </div>
+         <div class="flex_body-pizza-child">
+            <div >
                 <div>
                     <button onclick="redirectToUrl3()" class="button_pizza">Добавить в корзину заказа</button>
                     <script>
@@ -57,9 +36,7 @@
                     </script>
                 </div>
             </div>
-            <p></p>
-        </div>
+         </div>
     </div>
 
-</body>
-</html>
+{% endblock %}
